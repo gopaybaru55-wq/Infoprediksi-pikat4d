@@ -2106,9 +2106,18 @@ textarea.bug-field { resize: vertical; min-height: 90px; }
         if (document.getElementById('ze-snippet')) return;
         var script = document.createElement('script');
         script.id = 'ze-snippet';
-        script.src = 'https://static.zdassets.com/ekr/snippet.js?key=8720d7b7-878f-4b82-a73d-a4331273e116';
+        script.src = 'https://static.zdassets.com/ekr/snippet.js?key=6043a70b-5c7b-40c9-9853-e74987d6b414';
+        script.onload = function() {
+            // ── MEMINDAHKAN TOMBOL CHAT KE SEBELAH KANAN ──
+            window.zE('webWidget', 'updateSettings', {
+                webWidget: {
+                    position: { horizontal: 'right', vertical: 'bottom' }
+                }
+            });
+        };
         document.body.appendChild(script);
     }
+    
     // Muat setelah 3 detik ATAU saat user mulai scroll/interaksi, mana yang lebih dulu
     var loaded = false;
     function triggerLoad() {
@@ -2122,11 +2131,9 @@ textarea.bug-field { resize: vertical; min-height: 90px; }
     setTimeout(triggerLoad, 3000);
 })();
 </script>
-<!-- End of Zendesk Widget script -->
-<!-- Zendesk Mobile Offset — paksa naik via CSS -->
 <style>
+/* Untuk Tampilan HP / Mobile */
 @media (max-width: 768px) {
-  /* Iframe utama tombol Zendesk */
   #launcher,
   iframe[data-product="web_widget"],
   div[data-testid="launcher"],
@@ -2137,8 +2144,23 @@ textarea.bug-field { resize: vertical; min-height: 90px; }
   iframe[title*="messaging"],
   div[id*="ze-snippet"],
   div[class*="zendesk"] {
-    bottom: 90px !important;
-    transform: translateY(0) !important;
+    right: 15px !important;      /* Jarak dari tepi kanan layar HP */
+    left: auto !important;        /* Mematikan setelan kiri bawaan */
+    bottom: 90px !important;     /* Naik 90px agar tidak tertutup Menu Bar Bawah (Bottom Nav) */
+    z-index: 999999 !important;
+  }
+}
+
+/* Untuk Tampilan Komputer / Desktop */
+@media (min-width: 769px) {
+  #launcher,
+  iframe[data-product="web_widget"],
+  div[data-testid="launcher"],
+  .zEWidget-launcher,
+  iframe[title="Button to launch messaging window"] {
+    right: 20px !important;      /* Jarak aman dari kanan layar PC */
+    left: auto !important;
+    bottom: 20px !important;     /* Jarak aman dari bawah layar PC */
   }
 }
 </style>
