@@ -671,6 +671,32 @@
   @media (max-width: 480px) {
     .stats-grid { grid-template-columns: 1fr; }
   }
+/* ── MEMBUAT TULISAN MENU SIDEBAR MENJADI HITAM PEKAT ── */
+.sidebar a, 
+.sidebar .nav-link, 
+.sidebar .menu-item,
+.sidebar span,
+.sidebar li {
+    color: #000000 !important; /* Memaksa warna tulisan menjadi hitam pekat */
+    opacity: 1 !important;     /* Menghilangkan efek transparan/pudar */
+    font-weight: 700 !important; /* Membuat tulisan sedikit lebih tebal agar makin tegas */
+}
+
+/* Tulisan judul kategori kecil di atas (seperti kata "UTAMA") agar ikut hitam pekat */
+.sidebar .menu-header,
+.sidebar .category-title,
+.sidebar p {
+    color: #000000 !important;
+    opacity: 0.8 !important; /* Sedikit sentuhan lembut tapi tetap hitam tegas */
+}
+
+/* ── EFEK SAAT MENU DI-HOVER ATAU AKTIF (BIAR TETAP ENYAMAN DI MATA) ── */
+.sidebar a:hover, 
+.sidebar .nav-link.active, 
+.sidebar .menu-item.active {
+    background: #104c2a !important; /* Background menu aktif berubah jadi hijau tua */
+    color: #ffffff !important;       /* Teks otomatis berubah jadi putih bersih saat aktif */
+}
 </style>
 </head>
 <body>
