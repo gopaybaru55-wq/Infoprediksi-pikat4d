@@ -38,12 +38,12 @@
     display: flex;
   }
 
- /* ── SIDEBAR — HIJAU TUA SOLID ── */
+/* ── SIDEBAR — HIJAU MUDA SEGAR & BERSIH ── */
   .sidebar {
     width: 230px;
     height: 100vh;
-    background: #0c3d22;
-    border-right: 1px solid rgba(126,217,87,0.2);
+    background: #e6f4ea; /* Latar belakang hijau muda yang bersih dan terang */
+    border-right: 1px solid #cbd5e0; /* Pembatas abu-abu tipis agar terlihat rapi */
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -54,7 +54,7 @@
   
   .sidebar-logo {
     padding: 20px 18px 14px;
-    border-bottom: 1px solid rgba(126,217,87,0.2);
+    border-bottom: 1px solid #cbd5e0; /* Pembatas bagian logo yang bersih */
     display: flex;
     align-items: center;
     gap: 10px;
@@ -64,13 +64,38 @@
   .sidebar-logo img { height: 34px; object-fit: contain; }
   
   .sidebar-badge {
-    background: var(--p-green-light);
-    color: #0c3d22;
+    background: #104c2a; /* Diubah menjadi hijau tua agar kontras di atas hijau muda */
+    color: #ffffff; /* Teks badge menjadi putih bersih */
     font-size: 9px;
     font-weight: 700;
     padding: 3px 8px;
     border-radius: 20px;
     letter-spacing: 1px;
+  }
+
+/* ── MEMASTIKAN TEKS & IKON NAVIGASI JELAS (WARNA HITAM/GELAP) ── */
+  .sidebar a, .sidebar .nav-link, .sidebar .menu-item {
+    color: #1a202c !important; /* Warna teks abu-abu gelap kehitaman agar ikon hitam Anda serasi */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  /* Efek saat menu disorot (Hover) atau Menu sedang Aktif */
+  .sidebar a:hover, .sidebar .nav-link.active, .sidebar .menu-item.active {
+    background: #104c2a !important; /* Latar belakang menu aktif menjadi hijau tua solid */
+    color: #ffffff !important; /* Teks menu aktif otomatis berubah menjadi putih bersih */
+    border-radius: 8px;
+    margin: 0 10px;
+  }
+
+  /* Mengubah ikon hitam menjadi putih secara otomatis HANYA saat menu aktif/di-hover */
+  .sidebar a:hover img, .sidebar .nav-link.active img, .sidebar .menu-item.active img {
+    filter: brightness(0) invert(1) !important;
   }
   
   /* Area Navigasi Tengah - Kunci Utama Scroll Lunak */
