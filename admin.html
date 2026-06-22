@@ -1,0 +1,2856 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIKAT4D Admin Panel</title>
+<link href="https://images.linkcdn.cloud/V2/507/favicon/favicon-1888287302.png" rel="icon" type="image/png"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --p-green       : #0f9d58;
+    --p-green-dark  : #0c7d46;
+    --p-green-light : #7ed957;
+    --p-green-lime  : #b8f23c;
+    --p-green-dim   : rgba(15,157,88,0.1);
+    --p-green-border: rgba(15,157,88,0.25);
+    --red           : #b32e2e;
+    --bg            : #f8f9fa;
+    --surface       : #ffffff;
+    --surface2      : #f2f7f3;
+    --surface3      : #e6f0e8;
+    --text          : #1c1c1c;
+    --text-muted    : #6b7d70;
+    --danger        : #e53e3e;
+    --success       : #0f9d58;
+    --info          : #2b6cb0;
+    --radius        : 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+  }
+
+ /* ── SIDEBAR — HIJAU TUA SOLID ── */
+  .sidebar {
+    width: 230px;
+    height: 100vh;
+    background: #0c3d22;
+    border-right: 1px solid rgba(126,217,87,0.2);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 200;
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar-logo {
+    padding: 20px 18px 14px;
+    border-bottom: 1px solid rgba(126,217,87,0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  
+  .sidebar-logo img { height: 34px; object-fit: contain; }
+  
+  .sidebar-badge {
+    background: var(--p-green-light);
+    color: #0c3d22;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+  
+  /* Area Navigasi Tengah - Kunci Utama Scroll Lunak */
+  .sidebar-nav { 
+    padding: 12px 10px; 
+    flex: 1; 
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+  
+  .sidebar-nav::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .nav-group-label {
+    font-size: 10px;
+    color: rgba(184,217,194,0.7);
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    padding: 0 10px;
+    margin: 18px 0 8px;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+  
+  /* Tombol/Item Menu Navigasi */
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #c9e3d2;
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    border-left: 4px solid transparent;
+    transition: all 0.25s ease;
+  }
+  
+  .nav-item:hover { 
+    background: rgba(126,217,87,0.14);
+    color: #ffffff;
+    padding-left: 16px;
+  }
+  
+  .nav-item:hover .icon {
+    color: var(--p-green-light);
+  }
+  
+  /* Menu Penanda Halaman yang Sedang Dibuka (ACTIVE) */
+  .nav-item.active {
+    background: rgba(126,217,87,0.2);
+    color: #ffffff;
+    font-weight: 700;
+    border-left: 4px solid var(--p-green-light);
+    padding-left: 12px;
+    border-radius: 0 8px 8px 0;
+  }
+  
+  .nav-item.active .icon {
+    color: var(--p-green-light);
+  }
+  
+  .nav-item .icon { 
+    font-size: 16px; 
+    width: 20px; 
+    text-align: center; 
+    flex-shrink: 0; 
+    color: rgba(184,217,194,0.7);
+    transition: color 0.25s ease;
+  }
+  
+  .sidebar-footer {
+    padding: 14px 18px;
+    border-top: 1px solid rgba(126,217,87,0.2);
+    font-size: 11px;
+    color: rgba(184,217,194,0.7);
+    background: #0c3d22;
+    flex-shrink: 0;
+  }
+  
+  .sidebar-footer span { display: block; margin-top: 3px; }
+  /* ── MAIN ── */
+  .main { margin-left: 230px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--p-green-border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 90;
+    box-shadow: 0 1px 6px rgba(15,157,88,0.08);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--p-green-dark);
+    letter-spacing: 1px;
+  }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(15,157,88,0.08);
+    border: 1px solid rgba(15,157,88,0.3);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--p-green-dark);
+    font-weight: 600;
+  }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--success);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .content { padding: 24px; flex: 1; max-width: 1100px; width: 100%; }
+
+  /* ── PAGES ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── STATS ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--p-green-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.2s, transform 0.2s;
+    box-shadow: 0 2px 8px rgba(15,157,88,0.06);
+  }
+  .stat-card:hover { border-color: var(--p-green); transform: translateY(-2px); }
+  .stat-icon {
+    font-size: 24px;
+    background: var(--p-green-dim);
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 800; color: var(--p-green-dark); line-height: 1; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--p-green-border);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 10px rgba(15,157,88,0.06);
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--p-green-border);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--p-green-dark);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── FORM ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .form-grid-2 { grid-template-columns: 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-group input[type="text"],
+  .form-group input[type="time"],
+  .form-group input[type="number"],
+  .form-group select,
+  .form-group textarea {
+    background: var(--surface2);
+    border: 1px solid rgba(15,157,88,0.2);
+    border-radius: 8px;
+    padding: 11px 13px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--p-green); }
+  .form-group select option { background: #ffffff; color: #1c1c1c; }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  .file-upload-area {
+    border: 2px dashed rgba(15,157,88,0.25);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: var(--surface2);
+    position: relative;
+  }
+  .file-upload-area:hover { border-color: var(--p-green); background: var(--p-green-dim); }
+  .file-upload-area input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .file-upload-label { font-size: 12px; color: var(--text-muted); pointer-events: none; }
+  .file-upload-label span { color: var(--p-green-dark); font-weight: 700; }
+  .logo-preview-wrap { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
+  .logo-preview-img {
+    width: 40px; height: 40px;
+    object-fit: contain;
+    border-radius: 6px;
+    border: 1px solid var(--p-green-border);
+    background: rgba(15,157,88,0.05);
+    display: none;
+  }
+  .logo-preview-name { font-size: 11px; color: var(--text-muted); }
+  .custom-league-wrap { margin-top: 8px; display: none; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.18s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--p-green); color: #fff; }
+  .btn-primary:hover { background: var(--p-green-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(126,217,87,0.4); }
+  .btn-danger { background: rgba(229,62,62,0.1); color: #c53030; border: 1px solid rgba(229,62,62,0.3); }
+  .btn-danger:hover { background: var(--danger); color: #fff; }
+  .btn-ghost { background: transparent; color: var(--p-green-dark); border: 1px solid var(--p-green-border); }
+  .btn-ghost:hover { background: var(--p-green-dim); }
+  /* ── TOMBOL EDIT ── */
+  .btn-edit {
+    background: rgba(43,108,176,0.1);
+    color: #1a56a0;
+    border: 1px solid rgba(43,108,176,0.3);
+  }
+  .btn-edit:hover { background: var(--info); color: #fff; }
+  .btn-sm { padding: 7px 13px; font-size: 12px; }
+  .btn-xs { padding: 5px 10px; font-size: 11px; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+
+  /* ── TOMBOL LOGOUT ── */
+  .btn-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(229,62,62,0.3);
+    background: rgba(229,62,62,0.08);
+    color: #c53030;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .btn-logout:hover {
+    background: var(--danger);
+    color: #fff;
+  }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; min-width: 480px; }
+  thead th {
+    background: var(--p-green-dim);
+    color: var(--p-green-dark);
+    padding: 11px 13px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--p-green-border);
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid rgba(15,157,88,0.08);
+    transition: background 0.15s;
+  }
+  tbody tr:hover { background: rgba(126,217,87,0.06); }
+  tbody td { padding: 12px 13px; font-size: 13px; vertical-align: middle; color: var(--text); }
+  .td-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .team-cell { display: flex; align-items: center; gap: 8px; }
+  .team-logo-thumb {
+    width: 30px; height: 30px;
+    object-fit: contain;
+    border-radius: 50%;
+    background: rgba(15,157,88,0.08);
+    border: 1px solid var(--p-green-border);
+    padding: 2px;
+    flex-shrink: 0;
+  }
+  .team-logo-placeholder {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--surface3);
+    border: 1px solid rgba(15,157,88,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  /* ── BADGE ── */
+  .badge {
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  .badge-EPL    { background: rgba(105,0,217,0.12); color: #6b21a8; }
+  .badge-UCL    { background: rgba(49,130,206,0.12); color: #1e4e8c; }
+  .badge-LIGA1  { background: rgba(221,107,32,0.12); color: #9a3412; }
+  .badge-default{ background: rgba(0,0,0,0.06); color: #6b7280; }
+  .badge-active { background: rgba(15,157,88,0.12); color: var(--p-green-dark); }
+  .badge-inactive{ background: rgba(0,0,0,0.05); color: #9ca3af; }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0 16px;
+  }
+  .section-divider span {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .section-divider::before,
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--p-green-border);
+  }
+
+  /* ── TOAST ── */
+  #toast-container {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .toast {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-left: 4px solid var(--p-green);
+    box-shadow: 0 8px 30px rgba(15,157,88,0.15);
+    animation: toastIn 0.3s ease;
+    min-width: 240px;
+    max-width: 320px;
+    color: var(--text);
+  }
+  .toast.success { border-color: var(--success); }
+  .toast.error   { border-color: var(--danger); }
+  .toast.info    { border-color: var(--info); }
+  @keyframes toastIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  /* ── LOADER ── */
+  .loader {
+    display: inline-block;
+    width: 15px; height: 15px;
+    border: 2px solid rgba(15,157,88,0.2);
+    border-top-color: var(--p-green);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state {
+    text-align: center;
+    padding: 36px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .ei { font-size: 32px; margin-bottom: 8px; }
+
+  /* ── HAMBURGER ── */
+  .hamburger {
+    display: none;
+    background: none;
+    border: 1px solid var(--p-green-border);
+    border-radius: 6px;
+    color: var(--p-green-dark);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 6px 10px;
+    line-height: 1;
+  }
+  .overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(12,61,34,0.45);
+    z-index: 150;
+  }
+
+  /* ══════════════════════════════════════════
+     EDIT MODAL
+  ══════════════════════════════════════════ */
+  .edit-modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(12,61,34,0.45);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .edit-modal-overlay.show { display: flex; animation: modalIn .25s ease; }
+  @keyframes modalIn { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
+
+  .edit-modal {
+    background: var(--surface);
+    border: 1px solid var(--p-green-border);
+    border-radius: 18px;
+    padding: 28px 26px 24px;
+    width: 100%; max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 16px 48px rgba(15,157,88,0.18);
+    position: relative;
+  }
+  .edit-modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--p-green-dark);
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--p-green-border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .edit-modal-close {
+    position: absolute; top: 18px; right: 18px;
+    background: none; border: none;
+    font-size: 20px; color: var(--text-muted);
+    cursor: pointer; line-height: 1;
+    padding: 4px 8px; border-radius: 6px;
+    transition: background .15s;
+  }
+  .edit-modal-close:hover { background: rgba(0,0,0,0.06); color: var(--danger); }
+
+  .edit-modal .form-group input[type="text"],
+  .edit-modal .form-group select,
+  .edit-modal .form-group textarea {
+    background: var(--surface2);
+    border: 1px solid rgba(15,157,88,0.2);
+    border-radius: 8px;
+    padding: 11px 13px;
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .edit-modal .form-group input:focus,
+  .edit-modal .form-group select:focus,
+  .edit-modal .form-group textarea:focus { border-color: var(--p-green); }
+
+  .edit-modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--p-green-border);
+    flex-wrap: wrap;
+  }
+  /* Banner preview di dalam modal edit */
+  .edit-banner-preview {
+    max-width: 100%; max-height: 120px;
+    border-radius: 8px;
+    border: 1px solid var(--p-green-border);
+    margin-top: 8px;
+    display: none;
+  }
+
+  /* ── HIGHLIGHT baris yang sedang diedit ── */
+  tbody tr.editing-row { background: rgba(126,217,87,0.1) !important; outline: 2px solid var(--p-green-light); }
+
+  @media (max-width: 800px) {
+    .sidebar { transform: translateX(-100%); z-index: 300; }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .hamburger { display: block; }
+    .overlay.show { display: block; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid-2 { grid-template-columns: 1fr; }
+    .content { padding: 16px; }
+    .topbar { padding: 12px 16px; }
+    .edit-modal { padding: 22px 16px 18px; }
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <img src="https://i.imgur.com/DuwlIfJ.png" alt="Logo">
+    <span class="sidebar-badge">ADMIN</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Utama</div>
+    <button class="nav-item active" onclick="showPage('dashboard')">
+  <img src="icon/dasboard.png" alt="Dashboard" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none'"> Dashboard
+</button>
+<button class="nav-item" onclick="showPage('jadwal')">
+  <img src="icon/jadwal.png" alt="Jadwal Bola" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none'"> Jadwal Bola
+</button>
+<button class="nav-item" onclick="showPage('hasil')">
+  <img src="icon/score.png" alt="Prediksi Skor" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none'"> Prediksi Skor
+</button>
+<button class="nav-item" onclick="showPage('marquee')">
+  <img src="icon/running text.png" alt="Running Text" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none'"> Running Text
+</button>
+<button class="nav-item" onclick="showPage('banner')">
+  <img src="icon/banner slider.png" alt="Banner Promo" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none'"> Banner Promo
+</button>
+<button class="nav-item" onclick="showPage('selesai')">
+  <img src="icon/hasil.png" alt="Hasil Selesai" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none'"> Hasil Selesai
+</button>
+<button class="nav-item" onclick="showPage('laporan')">
+  <img src="icon/laporan.png" alt="Laporan User" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none'"> Laporan User
+</button>
+<button class="nav-item" onclick="showPage('panduan')">
+  <img src="icon/panduan.png" alt="Panduan" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;" onerror="this.style.display='none'"> Panduan
+</button>
+  </nav> 
+  <div class="sidebar-footer">
+    Terhubung ke Supabase
+    <span id="db-status" style="color:rgba(184,217,194,0.7);">Menghubungkan...</span>
+  </div>
+</aside>
+
+<!-- OVERLAY MOBILE -->
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="openSidebar()">☰</button>
+      <div class="topbar-title" id="page-title">DASHBOARD</div>
+    </div>
+    <div class="topbar-right">
+  <div class="status-pill">
+    <img src="icon/live.png" alt="Live" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Live
+  </div>
+  <button class="btn-logout" onclick="handleLogout()">
+    <img src="icon/keluar admin.png" alt="Keluar Panel" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Keluar Panel
+  </button>
+</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+  <div class="stat-card">
+    <img src="icon/jadwal.png" alt="Total Jadwal" style="width:35px;height:35px;margin-right:10px;" onerror="this.style.display='none'">
+    <div><div class="stat-label">Total Jadwal</div><div class="stat-val" id="stat-jadwal">—</div></div>
+  </div>
+  <div class="stat-card">
+    <img src="icon/score.png" alt="Prediksi Skor" style="width:35px;height:35px;margin-right:10px;" onerror="this.style.display='none'">
+    <div><div class="stat-label">Prediksi Skor</div><div class="stat-val" id="stat-hasil">—</div></div>
+  </div>
+  <div class="stat-card">
+    <img src="icon/running text.png" alt="Running Text" style="width:35px;height:35px;margin-right:10px;" onerror="this.style.display='none'">
+    <div><div class="stat-label">Running Text</div><div class="stat-val" id="stat-marquee">—</div></div>
+  </div>
+  <div class="stat-card">
+    <img src="icon/banner slider.png" alt="Banner Aktif" style="width:35px;height:35px;margin-right:10px;" onerror="this.style.display='none'">
+    <div><div class="stat-label">Banner Aktif</div><div class="stat-val" id="stat-banner">—</div></div>
+  </div>
+  <div class="stat-card">
+    <img src="icon/hasil.png" alt="Pertandingan Selesai" style="width:35px;height:35px;margin-right:10px;" onerror="this.style.display='none'">
+    <div><div class="stat-label">Pertandingan Selesai</div><div class="stat-val" id="stat-selesai">—</div></div>
+  </div>
+  <div class="stat-card">
+    <img src="icon/laporan.png" alt="Total Laporan" style="width:35px;height:35px;margin-right:10px;" onerror="this.style.display='none'">
+    <div><div class="stat-label">Total Laporan</div><div class="stat-val" id="stat-laporan">—</div></div>
+  </div>
+</div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+  <img src="icon/jadwal.png" alt="Jadwal Terbaru" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Jadwal Terbaru
+</div>
+          <button class="btn btn-ghost btn-sm" onclick="loadDashboard()">
+  <img src="icon/refresh.png" alt="Refresh" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Refresh
+</button>
+        </div>
+        <div id="recent-activity">
+          <div class="empty-state"><div class="loader"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ JADWAL ═══ -->
+    <div class="page" id="page-jadwal">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/tambah.png" alt="Tambah" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Tambah Jadwal
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:18px;">
+          <label>⚡ Auto-Fill Jadwal (Copas teks AI di sini)</label>
+          <textarea id="j-autofill" rows="3" placeholder="Format: Waktu | Liga | Pertandingan | Peluang | URL Logo Tuan Rumah | URL Logo Tim Tamu
+Contoh isi: 22:00 WIB | EPL | Arsenal vs Liverpool | H 45% | D 20% | A 35% | https://site.com/logo1.png | https://site.com/logo2.png" style="background:var(--surface2);border:1px solid rgba(15,157,88,0.2);border-radius:8px;padding:11px 13px;color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;outline:none;width:100%;resize:vertical;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Hari, Tanggal & Waktu (WIB)</label>
+          <input type="text" id="j-time" placeholder="Contoh: Sabtu, 06 Jun - 22:00 WIB" style="width:100%;padding:12px;background:var(--surface2);border:1px solid rgba(15,157,88,0.2);color:var(--text);border-radius:8px;font-size:14px;outline:none;">
+        </div>
+        <div class="form-group" style="margin-top:14px;">
+          <label>Liga</label>
+          <select id="j-league" onchange="handleLeagueChange('j')">
+            <option value="EPL">EPL</option>
+            <option value="UCL">UCL</option>
+            <option value="LIGA 1">LIGA 1</option>
+            <option value="LALIGA">LALIGA</option>
+            <option value="SERIE A">SERIE A</option>
+            <option value="BUNDESLIGA">BUNDESLIGA</option>
+            <option value="LIGUE 1">LIGUE 1</option>
+            <option value="CUSTOM">-- Tulis Liga Baru --</option>
+          </select>
+          <div class="custom-league-wrap" id="j-custom-wrap">
+            <input type="text" id="j-custom-league" placeholder="Tulis nama liga... (misal: EURO 2026)">
+          </div>
+        </div>
+        <div class="form-grid form-grid-2" style="margin-top:14px;">
+          <div class="form-group">
+            <label>Pertandingan</label>
+            <input type="text" id="j-match" placeholder="Arsenal vs Liverpool">
+          </div>
+          <div class="form-group">
+            <label>Peluang (Win Prob)</label>
+            <input type="text" id="j-prob" placeholder="H 45% | D 20% | A 35%">
+          </div>
+        </div>
+        <div class="section-divider"><span>Logo Tim (Opsional)</span></div>
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label>URL Logo Tim Tuan Rumah</label>
+            <input type="text" id="j-home-logo" placeholder="https://site.com/logo-home.png">
+          </div>
+          <div class="form-group">
+            <label>URL Logo Tim Tamu</label>
+            <input type="text" id="j-away-logo" placeholder="https://site.com/logo-away.png">
+          </div>
+        </div>
+         <div class="form-group" style="margin-top:14px; max-width:200px;">
+          <label>Urutan Tampil (sort_order)</label>
+          <input type="number" id="j-sort" placeholder="Contoh: 1" min="1">
+        </div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-primary" id="btn-add-jadwal" onclick="addJadwal()">
+  <img src="icon/tambah.png" alt="Tambah" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Simpan Jadwal
+</button>
+          <button class="btn btn-ghost" style="margin-left:8px;" onclick="resetJadwalForm()">
+  <img src="icon/bersihkan.png" alt="Bersihkan" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Bersihkan
+</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+  <img src="icon/jadwal.png" alt="Daftar Jadwal" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Daftar Jadwal
+</div>
+          <button class="btn btn-ghost btn-sm" onclick="loadJadwal()">
+  <img src="icon/refresh.png" alt="Refresh" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Refresh
+</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:48px;text-align:center;">No</th>
+                <th>Waktu</th>
+                <th>Liga</th>
+                <th>Tim Rumah</th>
+                <th>Tim Tamu</th>
+                <th>Peluang</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="jadwal-body">
+              <tr><td colspan="7"><div class="empty-state"><div class="loader"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ HASIL ═══ -->
+    <div class="page" id="page-hasil">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/tambah.png" alt="Tambah" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Tambah Prediksi Skor
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:18px;">
+          <label>⚡ Auto-Fill Prediksi Skor (Copas teks AI di sini)</label>
+          <textarea id="h-autofill" rows="3" placeholder="Format: Liga | Skor Akhir | Waktu | Tim Tuan Rumah | URL Logo Tuan Rumah | Tim Tamu | URL Logo Tim Tamu
+Contoh isi: EPL | 2-1 | Sabtu, 06 Jun - 22:00 WIB | Arsenal | https://site.com/logo1.png | Chelsea | https://site.com/logo2.png" style="background:var(--surface2);border:1px solid rgba(15,157,88,0.2);border-radius:8px;padding:11px 13px;color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;outline:none;width:100%;resize:vertical;"></textarea>
+        </div>
+
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label>Liga</label>
+            <select id="h-league" onchange="handleLeagueChange('h')">
+              <option value="EPL">EPL</option>
+              <option value="UCL">UCL</option>
+              <option value="LIGA 1">LIGA 1</option>
+              <option value="LALIGA">LALIGA</option>
+              <option value="SERIE A">SERIE A</option>
+              <option value="BUNDESLIGA">BUNDESLIGA</option>
+              <option value="LIGUE 1">LIGUE 1</option>
+              <option value="CUSTOM">-- Tulis Liga Baru --</option>
+            </select>
+            <div class="custom-league-wrap" id="h-custom-wrap">
+              <input type="text" id="h-custom-league" placeholder="Tulis nama liga...">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Skor Akhir</label>
+            <input type="text" id="h-score" placeholder="2 - 1">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+          <label>Waktu & Tanggal Pertandingan (WIB)</label>
+          <input type="text" id="h-time" placeholder="Contoh: Sabtu, 06 Jun - 22:00 WIB" style="width:100%;padding:12px;background:var(--surface2);border:1px solid rgba(15,157,88,0.2);color:var(--text);border-radius:8px;font-size:14px;outline:none;">
+        </div>
+        <div class="section-divider"><span>Data Tim Tuan Rumah</span></div>
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label>Nama Tim Tuan Rumah</label>
+            <input type="text" id="h-home" placeholder="Arsenal">
+          </div>
+          <div class="form-group">
+            <label>URL Logo Tim Tuan Rumah</label>
+            <input type="text" id="h-home-logo" placeholder="https://site.com/logo.png">
+          </div>
+        </div>
+        <div class="section-divider"><span>Data Tim Tamu</span></div>
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label>Nama Tim Tamu</label>
+            <input type="text" id="h-away" placeholder="Chelsea">
+          </div>
+          <div class="form-group">
+            <label>URL Logo Tim Tamu</label>
+            <input type="text" id="h-away-logo" placeholder="https://site.com/logo.png">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:14px; max-width:200px;">
+          <label>Urutan Tampil (sort_order)</label>
+          <input type="number" id="h-sort" placeholder="Contoh: 1" min="1">
+        </div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-primary" id="btn-add-hasil" onclick="addHasil()">
+  <img src="icon/tambah.png" alt="Tambah" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Simpan Hasil
+</button>
+
+          <button class="btn btn-ghost" style="margin-left:8px;" onclick="resetHasilForm()">
+  <img src="icon/bersihkan.png" alt="Bersihkan" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Bersihkan
+</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+  <img src="icon/score.png" alt="Daftar Hasil" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Daftar Hasil
+</div>
+          <button class="btn btn-ghost btn-sm" onclick="loadHasil()">
+  <img src="icon/refresh.png" alt="Refresh" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Refresh
+</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Liga</th>
+                <th>Tim Rumah</th>
+                <th>Skor</th>
+                <th>Tim Tamu</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="hasil-body">
+              <tr><td colspan="5"><div class="empty-state"><div class="loader"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MARQUEE ═══ -->
+    <div class="page" id="page-marquee">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/tambah.png" alt="Tambah" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Tambah Running Text
+          </div>
+        </div>
+        <div class="form-grid" style="grid-template-columns:1fr;">
+          <div class="form-group">
+            <label>Isi Teks Berjalan</label>
+            <textarea id="m-text" rows="3" placeholder="📢 PIKAT4D: Prediksi terbaik hari ini..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Status Awal</label>
+            <select id="m-status">
+              <option value="true">Aktif</option>
+              <option value="false">Nonaktif</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="btn-add-marquee" onclick="addMarquee()">
+  <img src="icon/tambah.png" alt="Tambah" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Simpan Teks
+</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+  <img src="icon/running text.png" alt="Daftar Running Text" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Daftar Running Text
+</div>
+          <button class="btn btn-ghost btn-sm" onclick="loadMarquee()">
+  <img src="icon/refresh.png" alt="Refresh" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Refresh
+</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Teks</th><th>Status</th><th>Aksi</th></tr>
+            </thead>
+            <tbody id="marquee-body">
+              <tr><td colspan="3"><div class="empty-state"><div class="loader"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BANNER ═══ -->
+    <div class="page" id="page-banner">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/tambah.png" alt="Tambah" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Tambah Banner
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>URL Gambar Banner</label>
+            <input type="text" id="b-url" placeholder="https://i.imgur.com/...">
+          </div>
+          <div class="form-group">
+            <label>Keterangan (Alt Text)</label>
+            <input type="text" id="b-alt" placeholder="Banner promo event">
+          </div>
+          <div class="form-group">
+            <label>Urutan Tampil</label>
+            <input type="number" id="b-order" placeholder="1" min="1">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="b-status">
+              <option value="true">Aktif</option>
+              <option value="false">Nonaktif</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <button class="btn btn-ghost btn-sm" onclick="previewBanner()">Preview Gambar</button>
+        </div>
+        <div id="b-preview-wrap" style="display:none;margin-bottom:14px;">
+          <img id="b-preview" style="max-width:280px;border-radius:8px;border:1px solid var(--p-green-border);">
+        </div>
+        <button class="btn btn-primary" id="btn-add-banner" onclick="addBanner()">
+  <img src="icon/tambah.png" alt="Tambah" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Simpan Banner
+</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+  <img src="icon/banner slider.png" alt="Daftar Banner" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Daftar Banner
+</div>
+          <button class="btn btn-ghost btn-sm" onclick="loadBanner()">
+  <img src="icon/refresh.png" alt="Refresh" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Refresh
+</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Preview</th><th>Keterangan</th><th>Urutan</th><th>Status</th><th>Aksi</th></tr>
+            </thead>
+            <tbody id="banner-body">
+              <tr><td colspan="5"><div class="empty-state"><div class="loader"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+   <!-- ═══ PERTANDINGAN SELESAI ═══ -->
+    <div class="page" id="page-selesai">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/hasil.png" alt="Tambah" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Tambah Pertandingan Selesai
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Hari, Tanggal & Waktu (WIB)</label>
+          <input type="text" id="ps-time" placeholder="Contoh: Sabtu, 06 Jun - 22:00 WIB" style="width:100%;padding:12px;background:var(--surface2);border:1px solid rgba(15,157,88,0.2);color:var(--text);border-radius:8px;font-size:14px;outline:none;">
+        </div>
+        <div class="form-group" style="margin-top:14px;">
+          <label>Liga</label>
+          <select id="ps-league" onchange="handleLeagueChange('ps')">
+            <option value="EPL">EPL</option>
+            <option value="UCL">UCL</option>
+            <option value="LIGA 1">LIGA 1</option>
+            <option value="LALIGA">LALIGA</option>
+            <option value="SERIE A">SERIE A</option>
+            <option value="BUNDESLIGA">BUNDESLIGA</option>
+            <option value="LIGUE 1">LIGUE 1</option>
+            <option value="CUSTOM">-- Tulis Liga Baru --</option>
+          </select>
+          <div class="custom-league-wrap" id="ps-custom-wrap">
+            <input type="text" id="ps-custom-league" placeholder="Tulis nama liga... (misal: EURO 2026)">
+          </div>
+        </div>
+        <div class="section-divider"><span>Data Tim Tuan Rumah</span></div>
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label>Nama Tim Tuan Rumah</label>
+            <input type="text" id="ps-home" placeholder="Arsenal">
+          </div>
+          <div class="form-group">
+            <label>URL Logo Tim Tuan Rumah</label>
+            <input type="text" id="ps-home-logo" placeholder="https://site.com/logo.png">
+          </div>
+        </div>
+        <div class="section-divider"><span>Data Tim Tamu</span></div>
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label>Nama Tim Tamu</label>
+            <input type="text" id="ps-away" placeholder="Chelsea">
+          </div>
+          <div class="form-group">
+            <label>URL Logo Tim Tamu</label>
+            <input type="text" id="ps-away-logo" placeholder="https://site.com/logo.png">
+          </div>
+        </div>
+        <div class="form-grid form-grid-2" style="margin-top:14px;">
+          <div class="form-group">
+            <label>Skor Akhir</label>
+            <input type="text" id="ps-score" placeholder="2 - 1">
+          </div>
+          <div class="form-group">
+            <label>Urutan Tampil (sort_order)</label>
+            <input type="number" id="ps-sort" placeholder="Contoh: 1" min="1">
+          </div>
+        </div>
+       <div style="margin-top:16px;">
+          <button class="btn btn-primary" id="btn-add-selesai" onclick="addPertandinganSelesai()">
+            <img src="icon/tambah.png" alt="Tambah" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Simpan Data
+          </button>
+          <button class="btn btn-ghost" style="margin-left:8px;" onclick="resetSelesaiForm()">
+            <img src="icon/bersihkan.png" alt="Bersihkan" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Bersihkan
+          </button>
+        </div>
+      </div>
+
+       <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/hasil.png" alt="Daftar Pertandingan Selesai" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Daftar Pertandingan Selesai
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="loadPertandinganSelesaiAdmin()">
+              <img src="icon/refresh.png" alt="Refresh" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Refresh
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="bersihkanDataLama()">
+              <img src="icon/bersihkan.png" alt="Bersihkan" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Bersihkan &gt;2 Hari
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:48px;text-align:center;">No</th>
+                <th>Waktu</th>
+                <th>Liga</th>
+                <th>Tim Rumah</th>
+                <th>Tim Tamu</th>
+                <th>Skor Akhir</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="selesai-body">
+              <tr><td colspan="7"><div class="empty-state"><div class="loader"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+<!-- ═══ LAPORAN BUG ═══ -->
+    <div class="page" id="page-laporan">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+  <img src="icon/laporan.png" alt="Daftar Laporan" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Daftar Laporan
+</div>
+          <button class="btn btn-ghost btn-sm" onclick="loadLaporan()">
+  <img src="icon/refresh.png" alt="Refresh" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Refresh
+</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:140px;">Tanggal</th>
+                <th style="width:110px;">Nama</th>
+                <th style="width:130px;">Tipe</th>
+                <th>Pesan</th>
+                <th style="width:100px;">Status</th>
+                <th style="width:140px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="laporan-body">
+              <tr><td colspan="6"><div class="empty-state"><div class="loader"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+   <!-- ═══ PANDUAN ADMIN ═══ -->
+    <div class="page" id="page-panduan">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/panduan.png" alt="Panduan" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Panduan Lengkap Panel Admin
+          </div>
+        </div>
+        <p style="font-size:14px;color:var(--text-muted);line-height:1.8;margin-bottom:0;">
+          Halaman ini menjelaskan cara pakai panel admin dengan bahasa sederhana,
+          supaya siapa pun bisa mengisi data tanpa bingung. Ikuti urutannya ya!
+        </p>
+      </div>
+
+      <!-- A. INPUT JADWAL -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/jadwal.png" alt="Jadwal" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> A. Cara Mengisi Jadwal & Peluang
+          </div>
+        </div>
+        <ol style="font-size:14px;line-height:2;color:var(--text);padding-left:22px;margin:0;">
+          <li>
+            Buka menu <strong style="color:var(--p-green-dark);">"Jadwal & Peluang"</strong> di sidebar kiri.
+          </li>
+          <li>
+            Isi <strong>"Hari, Tanggal & Waktu"</strong> — contoh:
+            <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">Sabtu, 06 Jun - 22:00 WIB</code>
+          </li>
+          <li>
+            Pilih <strong>Liga</strong> dari daftar (EPL, UCL, LIGA 1, dll). Kalau ligany tidak ada di daftar,
+            pilih <strong>"-- Tulis Liga Baru --"</strong> lalu ketik nama liganya sendiri.
+          </li>
+          <li>
+            Isi <strong>Pertandingan</strong> dengan format <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">Nama Tim A vs Nama Tim B</code> —
+            <u>wajib pakai kata " vs " di tengah</u>, supaya logo dan nama tim bisa terbaca otomatis.
+          </li>
+          <li>
+            Isi <strong>Peluang (Win Prob)</strong> dengan format
+            <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">H 45% | D 20% | A 35%</code>
+            — artinya peluang Tim A menang 45%, Seri 20%, Tim B menang 35%.
+          </li>
+          <li>
+            (Opsional) Isi <strong>URL Logo</strong> tim rumah & tim tamu kalau ada gambar logo nya. Kalau tidak ada, boleh dikosongkan.
+          </li>
+          <li>
+            Isi <strong>Urutan Tampil</strong> kalau ingin pertandingan ini muncul di posisi tertentu (angka kecil = tampil duluan).
+          </li>
+          <li>
+            Klik tombol <strong style="color:var(--p-green-dark);">"➕ Simpan Jadwal"</strong>. Selesai! Data langsung muncul di halaman utama.
+          </li>
+        </ol>
+
+        <div style="margin-top:18px;padding:14px;background:rgba(15,157,88,0.08);border:1px solid var(--p-green-border);border-radius:10px;">
+          <p style="font-size:14px;font-weight:700;color:var(--p-green-dark);margin-bottom:6px;">
+            Kalau pertandingan SUDAH SELESAI dimainkan, apa yang harus dilakukan?
+          </p>
+          <p style="font-size:14px;line-height:1.8;color:var(--text);margin:0;">
+            Di tabel <strong>"Daftar Jadwal"</strong>, cari baris pertandingan yang sudah selesai,
+            lalu klik tombol hijau <strong style="color:var(--p-green-dark);">"Selesai & Pindahkan"</strong>.
+            Nanti akan muncul kotak kecil meminta kamu mengetik <strong>skor akhirnya</strong>
+            (contoh: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">2 - 1</code>).
+            Setelah itu data otomatis pindah ke menu <strong>"Pertandingan Selesai"</strong>
+            dan hilang dari daftar jadwal — <u>tidak perlu hapus manual</u>!
+          </p>
+        </div>
+      </div>
+
+      <!-- B. PREDIKSI SKOR -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/score.png" alt="Skor" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> B. Cara Mengisi Prediksi Skor Akurat
+          </div>
+        </div>
+        <ol style="font-size:14px;line-height:2;color:var(--text);padding-left:22px;margin:0;">
+          <li>
+            Buka menu <strong style="color:var(--p-green-dark);">"PREDIKSI SKOR AKURAT"</strong> di sidebar kiri.
+          </li>
+          <li>
+            Pilih <strong>Liga</strong> pertandingan tersebut.
+          </li>
+          <li>
+            Isi <strong>Skor Akhir</strong> dengan tebakan skor — contoh:
+            <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">2 - 1</code>.
+            Ini adalah <u>prediksi/tebakan</u>, bukan hasil asli pertandingan.
+          </li>
+          <li>
+            Isi <strong>Waktu & Tanggal Pertandingan</strong> — contoh:
+            <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">Sabtu, 06 Jun - 22:00 WIB</code>.
+          </li>
+          <li>
+            Isi <strong>Nama Tim Tuan Rumah</strong> dan <strong>Nama Tim Tamu</strong> secara terpisah
+            (di sini <u>tidak perlu</u> pakai " vs ", cukup nama tim saja per kotak).
+          </li>
+          <li>
+            (Opsional) Isi <strong>URL Logo</strong> kedua tim kalau ada.
+          </li>
+          <li>
+            Isi <strong>Urutan Tampil</strong> kalau perlu mengatur posisi kartu.
+          </li>
+          <li>
+            Klik <strong style="color:var(--p-green-dark);">"➕ Simpan Hasil"</strong>. Kartu prediksi akan langsung muncul
+            di tab <strong>"PREDIKSI SKOR AKURAT"</strong> pada halaman utama.
+          </li>
+        </ol>
+      </div>
+
+      <!-- C. NOMOR URUT -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">C. Soal Nomor Urut (No.) — Tidak Perlu Khawatir!</div>
+        </div>
+        <div style="padding:16px;background:rgba(15,157,88,0.06);border:1px solid rgba(15,157,88,0.2);border-radius:10px;">
+          <p style="font-size:14px;line-height:1.9;color:var(--text);margin:0;">
+            <strong>Admin TIDAK PERLU pusing</strong> mengatur nomor urut (No. 1, 2, 3, dst) secara manual.<br><br>
+            Sistem di halaman utama <strong>otomatis menghitung ulang nomor urut dari atas ke bawah</strong>
+            (1, 2, 3, 4, ...) setiap kali data ditampilkan — jadi <u>tidak akan pernah ada nomor kembar
+            atau nomor yang melompat-lompat</u> (seperti 1, 1, 3, 3), walaupun urutan datanya berubah-ubah.<br><br>
+            Kolom <strong>"Urutan Tampil"</strong> di form admin hanya berguna untuk
+            <strong>mengatur urutan tampilnya saja</strong> (mana yang di atas, mana yang di bawah) —
+            bukan untuk menentukan nomor yang tampil ke pengunjung.
+            Jadi isi saja angka kecil untuk data yang ingin tampil duluan, dan jangan khawatir soal nomornya — itu sudah otomatis!
+          </p>
+        </div>
+      </div>
+
+      <!-- D. RUNNING TEXT -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/running text.png" alt="Running Text" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> D. Cara Mengisi Running Text (Teks Berjalan)
+          </div>
+        </div>
+        <ol style="font-size:14px;line-height:2;color:var(--text);padding-left:22px;margin:0;">
+          <li>
+            Buka menu <strong style="color:var(--p-green-dark);">"Running Text"</strong> di sidebar kiri.
+          </li>
+          <li>
+            Ketik kalimat yang ingin berjalan di bagian atas halaman utama —
+            contoh: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">📢 Prediksi hari ini sudah update!</code>
+          </li>
+          <li>
+            Pilih <strong>Status</strong>:
+            <span style="color:var(--p-green-dark);font-weight:700;">Aktif</span> kalau ingin teks ini langsung tampil ke pengunjung,
+            atau <span style="color:#9ca3af;font-weight:700;">Nonaktif</span> kalau mau disimpan tapi belum ditampilkan dulu.
+          </li>
+        </ol>
+
+        <div style="margin-top:18px;padding:14px;background:rgba(15,157,88,0.08);border:1px solid var(--p-green-border);border-radius:10px;">
+          <p style="font-size:14px;line-height:1.8;color:var(--text);margin:0;">
+            <strong>Boleh punya lebih dari satu teks!</strong> Kalau ada beberapa teks yang statusnya
+            "Aktif", semuanya akan tampil bergantian berjalan satu per satu di halaman utama.<br><br>
+            Mau menonaktifkan teks tanpa menghapusnya? Klik tombol <strong>"Nonaktifkan"</strong> di tabel
+            "Daftar Running Text" — teksnya tetap tersimpan, tapi tidak tampil ke pengunjung.
+            Klik <strong>"Aktifkan"</strong> lagi kapan saja untuk menampilkannya kembali.
+          </p>
+        </div>
+      </div>
+
+      <!-- E. BANNER SLIDER -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/banner slider.png" alt="Banner" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> E. Cara Mengisi Banner Slider
+          </div>
+        </div>
+        <ol style="font-size:14px;line-height:2;color:var(--text);padding-left:22px;margin:0;">
+          <li>
+            Buka menu <strong style="color:var(--p-green-dark);">"Banner Slider"</strong> di sidebar kiri.
+          </li>
+          <li>
+            Isi <strong>URL Gambar Banner</strong> — ini adalah link gambar yang sudah di-upload
+            ke layanan hosting gambar (contoh: imgur, postimg, dll). Pastikan link-nya berakhiran
+            <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">.jpg</code>,
+            <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">.png</code>, atau
+            <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">.webp</code>.
+          </li>
+          <li>
+            Isi <strong>Keterangan (Alt Text)</strong> — tulis deskripsi singkat banner ini untuk apa,
+            contoh: <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">Banner Promo Piala Dunia 2026</code>.
+            Ini membantu Google mengenali gambar (bagus untuk SEO).
+          </li>
+          <li>
+            Isi <strong>Urutan Tampil</strong> — angka <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">1</code> akan
+            tampil pertama, <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;">2</code> tampil kedua, dan seterusnya.
+          </li>
+          <li>
+            Pilih <strong>Status</strong>: ✅ Aktif kalau ingin banner ini langsung muncul di slider halaman utama.
+          </li>
+          <li>
+            Klik tombol <strong>"Preview Gambar"</strong> dulu untuk memastikan gambarnya benar dan tidak rusak,
+            sebelum klik <strong style="color:var(--p-green-dark);">"Simpan Banner"</strong>.
+          </li>
+        </ol>
+
+        <div style="margin-top:18px;padding:14px;background:rgba(15,157,88,0.08);border:1px solid var(--p-green-border);border-radius:10px;">
+          <p style="font-size:14px;line-height:1.8;color:var(--text);margin:0;">
+            Slider di halaman utama akan otomatis bergeser menampilkan semua banner yang berstatus
+            "Aktif", sesuai urutan nomor yang sudah diisi. Kalau ingin sebuah banner berhenti tampil
+            sementara tanpa menghapusnya, klik <strong>"Nonaktifkan"</strong> saja.
+          </p>
+        </div>
+      </div>
+
+      <!-- F. PERTANDINGAN SELESAI -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/bersihkan.png" alt="Selesai" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> F. Tentang Menu Pertandingan Selesai
+          </div>
+        </div>
+        <p style="font-size:14px;line-height:1.9;color:var(--text);margin:0 0 14px;">
+          Menu ini berisi daftar pertandingan yang <strong>sudah selesai dimainkan</strong>, lengkap
+          dengan skor akhirnya. Data di sini akan tampil ke pengunjung di tab
+          <strong style="color:var(--p-green-dark);">"PERTANDINGAN SELESAI"</strong> pada halaman utama,
+          dikelompokkan otomatis menjadi 3 tabel: <strong>Hari Ini</strong>, <strong>Kemarin</strong>,
+          dan <strong>2 Hari Lalu</strong>.
+        </p>
+
+        <div style="padding:14px;background:rgba(15,157,88,0.06);border:1px solid rgba(15,157,88,0.2);border-radius:10px;margin-bottom:14px;">
+          <p style="font-size:14px;font-weight:700;color:var(--p-green-dark);margin-bottom:6px;">
+            Cara data masuk ke sini (otomatis dari menu Jadwal):
+          </p>
+          <p style="font-size:14px;line-height:1.8;color:var(--text);margin:0;">
+            Admin <u>tidak perlu</u> mengetik ulang data pertandingan secara manual di menu ini.
+            Caranya: buka menu <strong>"Jadwal & Peluang"</strong>, cari pertandingan yang sudah selesai,
+            lalu klik tombol <strong style="color:var(--p-green-dark);">"Selesai & Pindahkan"</strong> dan masukkan skor akhirnya.
+            Data otomatis muncul di sini.
+          </p>
+        </div>
+
+        <ol style="font-size:14px;line-height:2;color:var(--text);padding-left:22px;margin:0;">
+          <li>
+            <strong>Edit</strong> — kalau ada kesalahan ketik (misal salah skor atau nama tim),
+            klik tombol ini untuk membuka kotak edit, lalu klik "Simpan Perubahan".
+          </li>
+          <li>
+            <strong>Geser ke...</strong> — dropdown ini berguna kalau data masuk ke kelompok hari
+            yang salah (misal seharusnya "Kemarin" tapi malah muncul di "Hari Ini"). Pilih kelompok
+            yang benar dari dropdown ini, sistem akan otomatis memindahkannya.
+          </li>
+          <li>
+            <strong>Hapus</strong> — menghapus satu data secara permanen.
+          </li>
+          <li>
+            <strong>Bersihkan &gt;2 Hari</strong> — tombol ini ada di atas tabel.
+            Klik untuk menghapus <u>semua data</u> yang sudah lebih dari 2 hari lalu sekaligus,
+            supaya daftar tetap rapi dan tidak menumpuk.
+          </li>
+        </ol>
+      </div>
+
+      <!-- G. LAPORAN & SARAN -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <img src="icon/laporan.png" alt="Laporan" style="width:20px;height:20px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> G. Tentang Menu Laporan & Saran
+          </div>
+        </div>
+        <p style="font-size:14px;line-height:1.9;color:var(--text);margin:0 0 14px;">
+          Menu ini menampilkan semua <strong>laporan bug (kesalahan tampilan)</strong> dan
+          <strong>saran/ide</strong> yang dikirim oleh pengunjung lewat tombol
+          <strong>"Laporan & Saran"</strong> yang ada di halaman utama.
+          Data di sini muncul <u>secara langsung (realtime)</u> begitu pengunjung mengirim laporan —
+          tidak perlu refresh halaman.
+        </p>
+
+        <ol style="font-size:14px;line-height:2;color:var(--text);padding-left:22px;margin:0;">
+          <li>
+            Setiap laporan baru akan berstatus <span style="color:#9ca3af;font-weight:700;">Pending</span>
+            (artinya: belum ditangani).
+          </li>
+          <li>
+            Baca kolom <strong>"Tipe"</strong> untuk tahu jenis laporannya:
+            <span style="color:#6b21a8;font-weight:700;">Bug Layout</span> (tampilan rusak),
+            <span style="color:#9a3412;font-weight:700;">Error Data</span> (data salah/tidak update), atau
+            <span style="color:#1e4e8c;font-weight:700;">Saran Fitur</span> (ide dari pengunjung).
+          </li>
+          <li>
+            Kolom <strong>"Pesan"</strong> berisi keluhan/saran lengkap dari pengunjung.
+          </li>
+          <li>
+            Kalau laporan sudah selesai ditangani (misal bug-nya sudah diperbaiki),
+            klik tombol <strong style="color:var(--p-green-dark);">"Selesai"</strong> agar statusnya
+            berubah jadi "Selesai" — ini hanya untuk catatan admin, pengunjung tidak melihat status ini.
+          </li>
+          <li>
+            Klik <strong>Hapus</strong> untuk menghapus laporan yang sudah tidak diperlukan.
+          </li>
+        </ol>
+
+        <div style="margin-top:18px;padding:14px;background:rgba(15,157,88,0.08);border:1px solid var(--p-green-border);border-radius:10px;">
+          <p style="font-size:14px;line-height:1.8;color:var(--text);margin:0;">
+            <strong>Tips:</strong> Cek menu ini secara rutin (misal sekali sehari).
+            Kalau ada banyak laporan "Bug Layout" tentang hal yang sama, kemungkinan ada masalah
+            tampilan yang perlu segera diperbaiki di website.
+          </p>
+        </div>
+      </div>
+
+    </div><!-- /#page-panduan -->
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<div id="toast-container"></div>
+
+<!-- ══════════════════════════════════════════════════════
+     EDIT MODAL — JADWAL
+══════════════════════════════════════════════════════ -->
+<div class="edit-modal-overlay" id="modal-edit-jadwal">
+  <div class="edit-modal">
+    <button class="edit-modal-close" onclick="closeModal('jadwal')">✕</button>
+    <div class="edit-modal-title">✏️ Edit Jadwal</div>
+    <input type="hidden" id="ej-id">
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>Hari, Tanggal & Waktu (WIB)</label>
+      <input type="text" id="ej-time" placeholder="Contoh: Sabtu, 06 Jun - 22:00 WIB">
+    </div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>Liga</label>
+      <input type="text" id="ej-league" placeholder="EPL / UCL / LIGA 1 / dll">
+    </div>
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label>Pertandingan</label>
+        <input type="text" id="ej-match" placeholder="Arsenal vs Liverpool">
+      </div>
+      <div class="form-group">
+        <label>Peluang (Win Prob)</label>
+        <input type="text" id="ej-prob" placeholder="H 45% | D 20% | A 35%">
+      </div>
+    </div>
+    <div class="section-divider"><span>Logo Tim (Opsional)</span></div>
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label>URL Logo Tim Rumah</label>
+        <input type="text" id="ej-home-logo" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label>URL Logo Tim Tamu</label>
+        <input type="text" id="ej-away-logo" placeholder="https://...">
+      </div>
+    </div>
+     <div class="form-group" style="margin-top:14px; max-width:200px;">
+      <label>Urutan Tampil (sort_order)</label>
+      <input type="number" id="ej-sort" placeholder="Contoh: 1" min="1">
+    </div>
+    <div class="edit-modal-actions">
+      <button class="btn btn-primary" id="btn-save-jadwal" onclick="saveEditJadwal()">💾 Simpan Perubahan</button>
+      <button class="btn btn-ghost" onclick="closeModal('jadwal')">Batal</button>
+    </div>
+  </div>
+  </div>
+
+<!-- ══════════════════════════════════════════════════════
+     EDIT MODAL — HASIL
+══════════════════════════════════════════════════════ -->
+<div class="edit-modal-overlay" id="modal-edit-hasil">
+  <div class="edit-modal">
+    <button class="edit-modal-close" onclick="closeModal('hasil')">✕</button>
+    <div class="edit-modal-title">✏️ Edit Prediksi Skor</div>
+    <input type="hidden" id="eh-id">
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label>Liga</label>
+        <input type="text" id="eh-league" placeholder="EPL / UCL / dll">
+      </div>
+      <div class="form-group">
+        <label>Skor</label>
+        <input type="text" id="eh-score" placeholder="2 - 1">
+      </div>
+    </div>
+    <div class="form-group" style="margin:14px 0;">
+      <label>Waktu & Tanggal (WIB)</label>
+      <input type="text" id="eh-time" placeholder="Sabtu, 06 Jun - 22:00 WIB">
+    </div>
+    <div class="section-divider"><span>Tim Tuan Rumah</span></div>
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label>Nama Tim Rumah</label>
+        <input type="text" id="eh-home" placeholder="Arsenal">
+      </div>
+      <div class="form-group">
+        <label>URL Logo Tim Rumah</label>
+        <input type="text" id="eh-home-logo" placeholder="https://...">
+      </div>
+    </div>
+    <div class="section-divider"><span>Tim Tamu</span></div>
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label>Nama Tim Tamu</label>
+        <input type="text" id="eh-away" placeholder="Chelsea">
+      </div>
+      <div class="form-group">
+        <label>URL Logo Tim Tamu</label>
+        <input type="text" id="eh-away-logo" placeholder="https://...">
+      </div>
+    </div>
+   <div class="form-group" style="margin-top:14px; max-width:200px;">
+      <label>Urutan Tampil (sort_order)</label>
+      <input type="number" id="eh-sort" placeholder="Contoh: 1" min="1">
+    </div>
+    <div class="edit-modal-actions">
+      <button class="btn btn-primary" id="btn-save-hasil" onclick="saveEditHasil()">💾 Simpan Perubahan</button>
+      <button class="btn btn-ghost" onclick="closeModal('hasil')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     EDIT MODAL — MARQUEE
+══════════════════════════════════════════════════════ -->
+<div class="edit-modal-overlay" id="modal-edit-marquee">
+  <div class="edit-modal">
+    <button class="edit-modal-close" onclick="closeModal('marquee')">✕</button>
+    <div class="edit-modal-title">✏️ Edit Running Text</div>
+    <input type="hidden" id="em-id">
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>Isi Teks Berjalan</label>
+      <textarea id="em-text" rows="4" placeholder="📢 PIKAT4D: Prediksi terbaik hari ini..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="em-status">
+        <option value="true">Aktif</option>
+        <option value="false">Nonaktif</option>
+      </select>
+    </div>
+    <div class="edit-modal-actions">
+      <button class="btn btn-primary" id="btn-save-marquee" onclick="saveEditMarquee()">💾 Simpan Perubahan</button>
+      <button class="btn btn-ghost" onclick="closeModal('marquee')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     EDIT MODAL — PERTANDINGAN SELESAI
+══════════════════════════════════════════════════════ -->
+<div class="edit-modal-overlay" id="modal-edit-selesai">
+  <div class="edit-modal">
+    <button class="edit-modal-close" onclick="closeModal('selesai')">✕</button>
+    <div class="edit-modal-title">✏️ Edit Pertandingan Selesai</div>
+    <input type="hidden" id="eps-id">
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>Hari, Tanggal & Waktu (WIB)</label>
+      <input type="text" id="eps-time" placeholder="Contoh: Sabtu, 06 Jun - 22:00 WIB">
+    </div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>Liga</label>
+      <input type="text" id="eps-league" placeholder="EPL / UCL / LIGA 1 / dll">
+    </div>
+    <div class="section-divider"><span>Tim Tuan Rumah</span></div>
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label>Nama Tim Rumah</label>
+        <input type="text" id="eps-home" placeholder="Arsenal">
+      </div>
+      <div class="form-group">
+        <label>URL Logo Tim Rumah</label>
+        <input type="text" id="eps-home-logo" placeholder="https://...">
+      </div>
+    </div>
+    <div class="section-divider"><span>Tim Tamu</span></div>
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label>Nama Tim Tamu</label>
+        <input type="text" id="eps-away" placeholder="Chelsea">
+      </div>
+      <div class="form-group">
+        <label>URL Logo Tim Tamu</label>
+        <input type="text" id="eps-away-logo" placeholder="https://...">
+      </div>
+    </div>
+    <div class="form-grid form-grid-2" style="margin-top:14px;">
+      <div class="form-group">
+        <label>Skor Akhir</label>
+        <input type="text" id="eps-score" placeholder="2 - 1">
+      </div>
+      <div class="form-group" style="max-width:200px;">
+        <label>Urutan Tampil (sort_order)</label>
+        <input type="number" id="eps-sort" placeholder="Contoh: 1" min="1">
+      </div>
+    </div>
+    <div class="edit-modal-actions">
+      <button class="btn btn-primary" id="btn-save-selesai" onclick="saveEditSelesai()">💾 Simpan Perubahan</button>
+      <button class="btn btn-ghost" onclick="closeModal('selesai')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     EDIT MODAL — BANNER
+══════════════════════════════════════════════════════ -->
+<div class="edit-modal-overlay" id="modal-edit-banner">
+  <div class="edit-modal">
+    <button class="edit-modal-close" onclick="closeModal('banner')">✕</button>
+    <div class="edit-modal-title">✏️ Edit Banner</div>
+    <input type="hidden" id="eb-id">
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>URL Gambar Banner</label>
+      <input type="text" id="eb-url" placeholder="https://i.imgur.com/..." oninput="updateEditBannerPreview()">
+      <img id="eb-preview" class="edit-banner-preview">
+    </div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>Keterangan (Alt Text)</label>
+      <input type="text" id="eb-alt" placeholder="Banner promo event">
+    </div>
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label>Urutan Tampil</label>
+        <input type="number" id="eb-order" placeholder="1" min="1">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+       <select id="eb-status">
+          <option value="true">Aktif</option>
+          <option value="false">Nonaktif</option>
+        </select>
+      </div>
+    </div>
+    <div class="edit-modal-actions">
+      <button class="btn btn-primary" id="btn-save-banner" onclick="saveEditBanner()">💾 Simpan Perubahan</button>
+      <button class="btn btn-ghost" onclick="closeModal('banner')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIG & INIT — PIKAT4D
+// ═══════════════════════════════════════════
+const SUPABASE_URL  = 'https://hboyqdswhmdyxykpvxri.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhib3lxZHN3aG1keXh5a3B2eHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwMDU0MDUsImV4cCI6MjA5MjU4MTQwNX0.uy6RRXZknbo3sPok6TvYrThi6yBWUjQg263-7nOvnLQ';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+async function checkAuth() {
+  const { data: { session }, error } = await db.auth.getSession();
+  if (!session || error) {
+    window.location.href = 'login.html';
+  } else {
+    initApp();
+  }
+}
+checkAuth();
+
+async function handleLogout() {
+  const { error } = await db.auth.signOut();
+  if (error) { toast('Gagal keluar: ' + error.message, 'error'); }
+  else { window.location.href = 'login.html'; }
+}
+
+async function initApp() {
+  await checkDb();
+  loadDashboard();
+  loadJadwal();
+  loadHasil();
+  loadMarquee();
+  loadBanner();
+  loadLaporan();
+  loadPertandinganSelesaiAdmin();
+}
+
+async function checkDb() {
+  const el = document.getElementById('db-status');
+  try {
+    const { error } = await db.from('jadwal').select('time').limit(1);
+    if (error && error.code !== 'PGRST116') throw error;
+    el.textContent = 'Terhubung';
+    el.style.color = '#7ed957';
+  } catch (err) {
+    el.textContent = 'Gagal';
+    el.style.color = 'var(--danger)';
+  }
+}
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+const PAGE_TITLES = {
+  dashboard: 'DASHBOARD', jadwal: 'JADWAL & PELUANG',
+  hasil: 'PREDIKSI SKOR AKURAT', marquee: 'RUNNING TEXT',
+  banner: 'BANNER SLIDER', laporan: 'LAPORAN & SARAN',
+  selesai: 'PERTANDINGAN SELESAI', panduan: 'PANDUAN ADMIN'
+};
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.getElementById('page-title').textContent = PAGE_TITLES[id] || id.toUpperCase();
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick')?.includes("'" + id + "'")) n.classList.add('active');
+  });
+  closeSidebar();
+}
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+function toast(msg, type = 'success') {
+  const icons = {
+    success: '<img src="icon/aktif.png" style="width:20px;height:20px;vertical-align:middle;" onerror="this.style.display=\'none\'">',
+    error: '<img src="icon/delete.png" style="width:20px;height:20px;vertical-align:middle;" onerror="this.style.display=\'none\'">',
+    info: '<img src="icon/laporan.png" style="width:20px;height:20px;vertical-align:middle;" onerror="this.style.display=\'none\'">'
+  };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${icons[type] || ''}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 0.3s';
+    setTimeout(() => el.remove(), 300);
+  }, 3500);
+}
+
+// ═══════════════════════════════════════════
+// UTILITY
+// ═══════════════════════════════════════════
+function handleLeagueChange(prefix) {
+  const sel  = document.getElementById(prefix + '-league');
+  const wrap = document.getElementById(prefix + '-custom-wrap');
+  wrap.style.display = sel.value === 'CUSTOM' ? 'block' : 'none';
+  if (sel.value === 'CUSTOM') document.getElementById(prefix + '-custom-league').focus();
+}
+
+function getLeagueValue(prefix) {
+  const sel = document.getElementById(prefix + '-league');
+  if (sel.value === 'CUSTOM') {
+    return document.getElementById(prefix + '-custom-league').value.trim().toUpperCase() || null;
+  }
+  return sel.value;
+}
+
+function renderLogoCell(logoSrc, name) {
+  if (logoSrc) {
+    return `<div class="team-cell">
+      <img src="${logoSrc}" class="team-logo-thumb" alt="${name}" onerror="this.style.display='none'">
+      <span>${name}</span>
+    </div>`;
+  }
+  return `<div class="team-cell"><div class="team-logo-placeholder">?</div><span>${name}</span></div>`;
+}
+
+function leagueBadge(league) {
+  const map = { 'EPL': 'badge-EPL', 'UCL': 'badge-UCL', 'LIGA 1': 'badge-LIGA1' };
+  const cls = map[league] || 'badge-default';
+  return `<span class="badge ${cls}">${league || '—'}</span>`;
+}
+
+function setBtnLoading(btn, isLoading, label) {
+  btn.disabled = isLoading;
+  btn.innerHTML = isLoading ? '<div class="loader"></div> ' + label : label;
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════
+async function loadDashboard() {
+  try {
+   const [j, h, m, b, l, ps] = await Promise.all([
+            db.from('jadwal').select('*', { count: 'exact', head: true }),
+            db.from('hasil').select('*', { count: 'exact', head: true }),
+            db.from('marquee').select('*', { count: 'exact', head: true }),
+            db.from('banner').select('*', { count: 'exact', head: true }).eq('is_active', true),
+            db.from('laporan_bug').select('*', { count: 'exact', head: true }),
+            db.from('pertandingan_selesai').select('*', { count: 'exact', head: true })
+        ]);
+   document.getElementById('stat-jadwal').textContent = j.count ?? '-';
+        document.getElementById('stat-hasil').textContent = h.count ?? '-';
+        document.getElementById('stat-marquee').textContent = m.count ?? '-';
+        document.getElementById('stat-banner').textContent = b.count ?? '-';
+        document.getElementById('stat-laporan').textContent = l.count ?? '-';
+        document.getElementById('stat-selesai').textContent = ps.count ?? '-';
+    
+    const { data } = await db.from('jadwal').select('*').order('created_at', { ascending: false }).limit(6);
+    const ra = document.getElementById('recent-activity');
+    if (!data?.length) {
+      ra.innerHTML = '<div class="empty-state"><div>Belum ada jadwal</div></div>';
+      return;
+    }
+    ra.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Waktu</th><th>Liga</th><th>Tim Rumah</th><th>Tim Tamu</th><th>Peluang</th></tr></thead>
+      <tbody>${data.map(r => {
+        const parts = (r.match_name || '').split(' vs ');
+        const home = parts[0]?.trim() || r.match_name || '—';
+        const away = parts[1]?.trim() || '—';
+        return `<tr>
+          <td style="white-space:nowrap;color:var(--p-green-dark);font-weight:700;">${r.time || '—'} WIB</td>
+          <td>${leagueBadge(r.league)}</td>
+          <td>${renderLogoCell(r.home_logo, home)}</td>
+          <td>${renderLogoCell(r.away_logo, away)}</td>
+          <td style="font-size:12px;font-weight:700;">${r.prob || '—'}</td>
+        </tr>`;
+      }).join('')}</tbody></table></div>`;
+  } catch (e) { console.error('Dashboard error:', e); }
+}
+
+// ═══════════════════════════════════════════
+// JADWAL
+// ═══════════════════════════════════════════
+async function loadJadwal() {
+  const body = document.getElementById('jadwal-body');
+  try {
+    const { data, error } = await db.from('jadwal').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data?.length) {
+      body.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div>Belum ada jadwal</div></div></td></tr>';      return;
+    }
+  body.innerHTML = data.map((r, index) => {
+      const parts = (r.match_name || '').split(' vs ');
+      const home = parts[0]?.trim() || '—';
+      const away = parts[1]?.trim() || '—';
+      return `<tr id="jrow-${r.id}">
+        <td style="text-align:center;font-weight:700;color:var(--p-green-dark);">${index + 1}</td>
+        <td style="white-space:nowrap;font-weight:700;color:var(--p-green-dark);">${r.time || '—'}</td>
+        <td>${leagueBadge(r.league)}</td>
+        <td>${renderLogoCell(r.home_logo, home)}</td>
+        <td>${renderLogoCell(r.away_logo, away)}</td>
+        <td style="font-size:12px;">${r.prob || '—'}</td>
+        <td><div class="td-actions">
+          <button class="btn btn-edit btn-xs" onclick="openEditJadwal(${r.id})">
+  <img src="icon/edit.png" alt="Edit" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Edit
+</button>
+
+          <button class="btn btn-xs" style="background:rgba(15,157,88,0.12);color:var(--p-green-dark);border:1px solid rgba(15,157,88,0.35);" onclick="pindahkanKeHasil(${r.id})">
+  <img src="icon/geser ke.png" alt="Selesai & Pindahkan" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Selesai & Pindahkan
+</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteRow('jadwal',${r.id},'jadwal-body',loadJadwal)">
+  <img src="icon/delete.png" alt="Hapus" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Hapus
+</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    body.innerHTML = `<tr><td colspan="7" style="color:var(--danger);text-align:center;padding:20px;">Error: ${e.message}</td></tr>`;
+  }
+}
+
+async function addJadwal() {
+  const time       = document.getElementById('j-time').value.trim();
+  const league     = getLeagueValue('j');
+  const match_name = document.getElementById('j-match').value.trim();
+  const prob       = document.getElementById('j-prob').value.trim();
+  const home_logo  = document.getElementById('j-home-logo').value.trim() || null;
+  const away_logo  = document.getElementById('j-away-logo').value.trim() || null;
+  const sort_order = parseInt(document.getElementById('j-sort').value) || null;
+
+  if (!time)       return toast('Waktu wajib diisi!', 'error');
+  if (!league)     return toast('Nama liga wajib diisi!', 'error');
+  if (!match_name) return toast('Pertandingan wajib diisi!', 'error');
+  if (!prob)       return toast('Peluang wajib diisi!', 'error');
+
+  const btn = document.getElementById('btn-add-jadwal');
+  setBtnLoading(btn, true, 'Menyimpan...');
+  try {
+    const { error } = await db.from('jadwal').insert([{ time, league, match_name, prob, home_logo, away_logo, sort_order }]);
+    if (error) throw error;
+    toast('Jadwal berhasil disimpan!');
+    resetJadwalForm();
+    loadJadwal(); loadDashboard();
+  } catch (e) { toast('Gagal menyimpan: ' + e.message, 'error'); }
+  finally { setBtnLoading(btn, false, '<img src="icon/tambah.png" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'"> Simpan Jadwal'); }
+}
+
+function resetJadwalForm() {
+  ['j-time','j-match','j-prob','j-custom-league','j-home-logo','j-away-logo','j-sort'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('j-league').value = 'EPL';
+  document.getElementById('j-custom-wrap').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════
+// AUTO-FILL JADWAL VIA TEXTAREA
+// ═══════════════════════════════════════════
+document.getElementById('j-autofill').addEventListener('input', function() {
+  const raw = this.value.trim();
+  if (!raw) return;
+
+  const parts = raw.split('|').map(p => p.trim());
+  if (parts.length < 4) return;
+
+  const waktu       = parts[0] || '';
+  const liga         = parts[1] || '';
+  const pertandingan = parts[2] || '';
+  const awayLogo     = parts[parts.length - 1] || '';
+  const homeLogo     = parts[parts.length - 2] || '';
+  const peluang      = parts.slice(3, parts.length - 2).join(' | ');
+
+  document.getElementById('j-time').value      = waktu;
+  document.getElementById('j-match').value     = pertandingan;
+  document.getElementById('j-prob').value      = peluang;
+  document.getElementById('j-home-logo').value = homeLogo;
+  document.getElementById('j-away-logo').value = awayLogo;
+
+  const ligaSelect = document.getElementById('j-league');
+  const ligaOptions = Array.from(ligaSelect.options).map(o => o.value);
+  if (ligaOptions.includes(liga.toUpperCase())) {
+    ligaSelect.value = liga.toUpperCase();
+    document.getElementById('j-custom-wrap').style.display = 'none';
+  } else if (liga) {
+    ligaSelect.value = 'CUSTOM';
+    document.getElementById('j-custom-wrap').style.display = 'block';
+    document.getElementById('j-custom-league').value = liga.toUpperCase();
+  }
+});
+/* ── EDIT JADWAL ── */
+async function openEditJadwal(id) {
+  const { data, error } = await db.from('jadwal').select('*').eq('id', id).single();
+  if (error) return toast('Gagal ambil data: ' + error.message, 'error');
+
+  document.getElementById('ej-id').value        = data.id;
+  document.getElementById('ej-time').value      = data.time || '';
+  document.getElementById('ej-league').value    = data.league || '';
+  document.getElementById('ej-match').value     = data.match_name || '';
+  document.getElementById('ej-prob').value      = data.prob || '';
+  document.getElementById('ej-home-logo').value = data.home_logo || '';
+  document.getElementById('ej-away-logo').value = data.away_logo || '';
+  document.getElementById('ej-sort').value = data.sort_order ?? '';
+
+  document.querySelectorAll('#jadwal-body tr').forEach(r => r.classList.remove('editing-row'));
+  const row = document.getElementById('jrow-' + id);
+  if (row) row.classList.add('editing-row');
+
+  document.getElementById('modal-edit-jadwal').classList.add('show');
+}
+
+async function saveEditJadwal() {
+    const id         = parseInt(document.getElementById('ej-id').value);
+    const time       = document.getElementById('ej-time').value.trim();
+    const league     = document.getElementById('ej-league').value.trim().toUpperCase();
+    const match_name = document.getElementById('ej-match').value.trim();
+    const prob       = document.getElementById('ej-prob').value.trim();
+    const home_logo  = document.getElementById('ej-home-logo').value.trim() || null;
+    const away_logo  = document.getElementById('ej-away-logo').value.trim() || null;
+    const sort_order = parseInt(document.getElementById('ej-sort').value) || null;
+
+    if (!time || !league || !match_name || !prob) {
+        return toast('Semua field wajib diisi!', 'error');
+    }
+
+    const btn = document.getElementById('btn-save-jadwal');
+    setBtnLoading(btn, true, 'Menyimpan...');
+    try {
+        const { error } = await db.from('jadwal').update({
+            time,
+            league,
+            match_name,
+            prob,
+            home_logo,
+            away_logo,
+            sort_order
+        }).eq('id', id);
+        if (error) throw error;
+        toast('Jadwal berhasil diperbarui!');
+        closeModal('jadwal');
+        loadJadwal();
+        loadDashboard();
+    } catch (e) {
+    toast('Gagal simpan: ' + e.message, 'error');
+  } finally {
+    setBtnLoading(btn, false, '<img src="icon/edit.png" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'"> Simpan Perubahan');
+  }
+}
+// ═══════════════════════════════════════════
+// HASIL
+// ═══════════════════════════════════════════
+async function loadHasil() {
+  const body = document.getElementById('hasil-body');
+  try {
+    const { data, error } = await db.from('hasil').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data?.length) {
+      body.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div>Belum ada hasil</div></div></td></tr>';
+      return;
+    }
+    body.innerHTML = data.map(r => `
+      <tr id="hrow-${r.id}">
+        <td>${leagueBadge(r.league)}</td>
+        <td>${renderLogoCell(r.home_logo, r.home || '—')}</td>
+        <td style="font-family:'Barlow Condensed';font-size:22px;font-weight:800;color:var(--p-green-dark);text-align:center;white-space:nowrap;">${r.score || '—'}</td>
+        <td>${renderLogoCell(r.away_logo, r.away || '—')}</td>
+        <td><div class="td-actions">
+          <button class="btn btn-edit btn-xs" onclick="openEditHasil(${r.id})">
+  <img src="icon/edit.png" alt="Edit" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Edit
+</button>
+
+          <button class="btn btn-danger btn-xs" onclick="deleteRow('hasil',${r.id},'hasil-body',loadHasil)">
+  <img src="icon/delete.png" alt="Hapus" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Hapus
+</button>
+        </div></td>
+      </tr>`).join('');
+  } catch (e) {
+    body.innerHTML = `<tr><td colspan="5" style="color:var(--danger);text-align:center;padding:20px;">Error: ${e.message}</td></tr>`;
+  }
+}
+
+async function addHasil() {
+  const league     = getLeagueValue('h');
+  const home       = document.getElementById('h-home').value.trim();
+  const away       = document.getElementById('h-away').value.trim();
+  const score      = document.getElementById('h-score').value.trim();
+  const match_time = document.getElementById('h-time').value.trim();
+  const home_logo  = document.getElementById('h-home-logo').value.trim() || null;
+  const away_logo  = document.getElementById('h-away-logo').value.trim() || null;
+  const sort_order = parseInt(document.getElementById('h-sort').value) || null;
+
+  if (!league)     return toast('Nama liga wajib diisi!', 'error');
+  if (!score)      return toast('Skor wajib diisi!', 'error');
+  if (!match_time) return toast('Waktu & tanggal wajib diisi!', 'error');
+  if (!home)       return toast('Nama tim tuan rumah wajib diisi!', 'error');
+  if (!away)       return toast('Nama tim tamu wajib diisi!', 'error');
+
+  const btn = document.getElementById('btn-add-hasil');
+  setBtnLoading(btn, true, 'Menyimpan...');
+  try {
+    const { error } = await db.from('hasil').insert([{ league, home, away, score, match_time, home_logo, away_logo, sort_order }]);
+    if (error) throw error;
+    toast('Hasil berhasil disimpan!');
+    resetHasilForm();
+    loadHasil(); loadDashboard();
+  } catch (e) { toast('Gagal menyimpan: ' + e.message, 'error'); }
+  finally { setBtnLoading(btn, false, '<img src="icon/tambah.png" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'"> Simpan Hasil'); }
+}
+
+function resetHasilForm() {
+  ['h-home','h-away','h-score','h-custom-league','h-home-logo','h-away-logo','h-time','h-sort'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('h-league').value = 'EPL';
+  document.getElementById('h-custom-wrap').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════
+// AUTO-FILL PREDIKSI SKOR VIA TEXTAREA
+// ═══════════════════════════════════════════
+document.getElementById('h-autofill').addEventListener('input', function() {
+  const raw = this.value.trim();
+  if (!raw) return;
+
+  const parts = raw.split('|').map(p => p.trim());
+  if (parts.length < 7) return;
+
+  const liga      = parts[0] || '';
+  const score     = parts[1] || '';
+  const matchTime = parts[2] || '';
+  const home      = parts[3] || '';
+  const homeLogo  = parts[4] || '';
+  const away      = parts[5] || '';
+  const awayLogo  = parts[6] || '';
+
+  document.getElementById('h-score').value     = score;
+  document.getElementById('h-time').value      = matchTime;
+  document.getElementById('h-home').value      = home;
+  document.getElementById('h-home-logo').value = homeLogo;
+  document.getElementById('h-away').value      = away;
+  document.getElementById('h-away-logo').value = awayLogo;
+
+  const ligaSelect = document.getElementById('h-league');
+  const ligaOptions = Array.from(ligaSelect.options).map(o => o.value);
+  if (ligaOptions.includes(liga.toUpperCase())) {
+    ligaSelect.value = liga.toUpperCase();
+    document.getElementById('h-custom-wrap').style.display = 'none';
+  } else if (liga) {
+    ligaSelect.value = 'CUSTOM';
+    document.getElementById('h-custom-wrap').style.display = 'block';
+    document.getElementById('h-custom-league').value = liga.toUpperCase();
+  }
+});
+/* ── EDIT HASIL ── */
+async function openEditHasil(id) {
+  const { data, error } = await db.from('hasil').select('*').eq('id', id).single();
+  if (error) return toast('Gagal ambil data: ' + error.message, 'error');
+
+  document.getElementById('eh-id').value        = data.id;
+  document.getElementById('eh-league').value    = data.league || '';
+  document.getElementById('eh-score').value     = data.score || '';
+  document.getElementById('eh-time').value      = data.match_time || '';
+  document.getElementById('eh-home').value      = data.home || '';
+  document.getElementById('eh-away').value      = data.away || '';
+  document.getElementById('eh-home-logo').value = data.home_logo || '';
+  document.getElementById('eh-away-logo').value = data.away_logo || '';
+  document.getElementById('eh-sort').value = data.sort_order ?? '';
+
+  document.querySelectorAll('#hasil-body tr').forEach(r => r.classList.remove('editing-row'));
+  const row = document.getElementById('hrow-' + id);
+  if (row) row.classList.add('editing-row');
+
+  document.getElementById('modal-edit-hasil').classList.add('show');
+}
+
+async function saveEditHasil() {
+  const id         = parseInt(document.getElementById('eh-id').value);
+  const league     = document.getElementById('eh-league').value.trim().toUpperCase();
+  const score      = document.getElementById('eh-score').value.trim();
+  const match_time = document.getElementById('eh-time').value.trim();
+  const home       = document.getElementById('eh-home').value.trim();
+  const away       = document.getElementById('eh-away').value.trim();
+  const home_logo  = document.getElementById('eh-home-logo').value.trim() || null;
+  const away_logo  = document.getElementById('eh-away-logo').value.trim() || null;
+  const sort_order = parseInt(document.getElementById('eh-sort').value) || null;
+
+  if (!league || !score || !home || !away) return toast('Field wajib harus diisi!', 'error');
+
+  const btn = document.getElementById('btn-save-hasil');
+  setBtnLoading(btn, true, 'Menyimpan...');
+  try {
+    const { error } = await db.from('hasil').update({
+            league,
+            score,
+            match_time,
+            home,
+            away,
+            home_logo,
+            away_logo,
+            sort_order
+        }).eq('id', id);
+        if (error) throw error;
+    toast('Hasil berhasil diperbarui!');
+    closeModal('hasil');
+    loadHasil(); loadDashboard();
+ } catch (e) {
+    toast('Gagal simpan: ' + e.message, 'error');
+  } finally {
+    setBtnLoading(btn, false, '<img src="icon/edit.png" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'"> Simpan Perubahan');
+  }
+}
+// ═══════════════════════════════════════════
+// MARQUEE
+// ═══════════════════════════════════════════
+async function loadMarquee() {
+  const body = document.getElementById('marquee-body');
+  try {
+    const { data, error } = await db.from('marquee').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data?.length) {
+      body.innerHTML = '<tr><td colspan="3"><div class="empty-state"><div>Belum ada teks</div></div></td></tr>';
+      return;
+    }
+    body.innerHTML = data.map(r => `
+      <tr id="mrow-${r.id}">
+        <td style="max-width:350px;word-break:break-word;font-size:13px;">${r.text}</td>
+        <td>
+          <span class="badge ${r.is_active ? 'badge-active' : 'badge-inactive'}">
+  ${r.is_active ? 'Aktif' : 'Nonaktif'}
+</span>
+        </td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-edit btn-xs" onclick="openEditMarquee(${r.id})">
+  <img src="icon/edit.png" alt="Edit" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Edit
+</button>
+            <button class="btn btn-ghost btn-xs" onclick="toggleField('marquee',${r.id},'is_active',${r.is_active},loadMarquee)">
+              ${r.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+            </button>
+            <button class="btn btn-danger btn-xs" onclick="deleteRow('marquee',${r.id},'marquee-body',loadMarquee)">
+  <img src="icon/delete.png" alt="Hapus" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Hapus
+</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  } catch (e) {
+    body.innerHTML = `<tr><td colspan="3" style="color:var(--danger);text-align:center;padding:20px;">Error: ${e.message}</td></tr>`;
+  }
+}
+
+async function addMarquee() {
+  const text      = document.getElementById('m-text').value.trim();
+  const is_active = document.getElementById('m-status').value === 'true';
+  if (!text) return toast('Teks wajib diisi!', 'error');
+
+  const btn = document.getElementById('btn-add-marquee');
+  setBtnLoading(btn, true, 'Menyimpan...');
+  try {
+    const { error } = await db.from('marquee').insert([{ text, is_active }]);
+    if (error) throw error;
+    toast('Running text berhasil disimpan!');
+    document.getElementById('m-text').value = '';
+    loadMarquee(); loadDashboard();
+ } catch (e) { toast('Gagal menyimpan: ' + e.message, 'error'); }
+  finally { setBtnLoading(btn, false, '<img src="icon/tambah.png" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'"> Simpan Teks'); }
+}
+/* ── EDIT MARQUEE ── */
+async function openEditMarquee(id) {
+  const { data, error } = await db.from('marquee').select('*').eq('id', id).single();
+  if (error) return toast('Gagal ambil data: ' + error.message, 'error');
+
+  document.getElementById('em-id').value     = data.id;
+  document.getElementById('em-text').value   = data.text || '';
+  document.getElementById('em-status').value = data.is_active ? 'true' : 'false';
+
+  document.querySelectorAll('#marquee-body tr').forEach(r => r.classList.remove('editing-row'));
+  const row = document.getElementById('mrow-' + id);
+  if (row) row.classList.add('editing-row');
+
+  document.getElementById('modal-edit-marquee').classList.add('show');
+}
+
+async function saveEditMarquee() {
+  const id        = parseInt(document.getElementById('em-id').value);
+  const text      = document.getElementById('em-text').value.trim();
+  const is_active = document.getElementById('em-status').value === 'true';
+
+  if (!text) return toast('Teks wajib diisi!', 'error');
+
+  const btn = document.getElementById('btn-save-marquee');
+  setBtnLoading(btn, true, 'Menyimpan...');
+  try {
+    const { error } = await db.from('marquee').update({ text, is_active }).eq('id', id);
+    if (error) throw error;
+    toast('Running text berhasil diperbarui!');
+    closeModal('marquee');
+    loadMarquee();
+  } catch (e) {
+    toast('Gagal simpan: ' + e.message, 'error');
+  } finally {
+    setBtnLoading(btn, false, '<img src="icon/edit.png" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'"> Simpan Perubahan');
+  }
+}
+// ═══════════════════════════════════════════
+// BANNER
+// ═══════════════════════════════════════════
+async function loadBanner() {
+  const body = document.getElementById('banner-body');
+  try {
+    const { data, error } = await db.from('banner').select('*').order('sort_order', { ascending: true });
+    if (error) throw error;
+    if (!data?.length) {
+      body.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div>Belum ada banner</div></div></td></tr>';
+      return;
+    }
+    body.innerHTML = data.map(r => `
+      <tr id="brow-${r.id}">
+        <td>
+          <img src="${r.image_url}" 
+               style="width:90px;height:50px;object-fit:cover;border-radius:6px;border:1px solid var(--p-green-border);" 
+               onerror="this.replaceWith(document.createTextNode('⚠️ Error'))">
+        </td>
+        <td style="max-width:160px;word-break:break-word;font-size:13px;">${r.alt_text || '—'}</td>
+        <td style="text-align:center;font-weight:700;">${r.sort_order}</td>
+        <td>
+          <span class="badge ${r.is_active ? 'badge-active' : 'badge-inactive'}">
+  ${r.is_active ? 'Aktif' : 'Nonaktif'}
+</span>
+        </td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-edit btn-xs" onclick="openEditBanner(${r.id})">
+  <img src="icon/edit.png" alt="Edit" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Edit
+</button>
+            <button class="btn btn-ghost btn-xs" onclick="toggleField('banner',${r.id},'is_active',${r.is_active},loadBanner)">
+              ${r.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+            </button>
+            <button class="btn btn-danger btn-xs" onclick="deleteRow('banner',${r.id},'banner-body',loadBanner)">
+  <img src="icon/delete.png" alt="Hapus" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Hapus
+</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  } catch (e) {
+    body.innerHTML = `<tr><td colspan="5" style="color:var(--danger);text-align:center;padding:20px;">Error: ${e.message}</td></tr>`;
+  }
+}
+
+function previewBanner() {
+  const url = document.getElementById('b-url').value.trim();
+  if (!url) return toast('Masukkan URL gambar dulu!', 'error');
+  document.getElementById('b-preview').src = url;
+  document.getElementById('b-preview-wrap').style.display = 'block';
+}
+
+async function addBanner() {
+  const image_url  = document.getElementById('b-url').value.trim();
+  const alt_text   = document.getElementById('b-alt').value.trim();
+  const sort_order = parseInt(document.getElementById('b-order').value) || 1;
+  const is_active  = document.getElementById('b-status').value === 'true';
+
+  if (!image_url) return toast('URL gambar wajib diisi!', 'error');
+
+  const btn = document.getElementById('btn-add-banner');
+  setBtnLoading(btn, true, 'Menyimpan...');
+  try {
+    const { error } = await db.from('banner').insert([{ image_url, alt_text, sort_order, is_active }]);
+    if (error) throw error;
+    toast('Banner berhasil disimpan!');
+    ['b-url','b-alt','b-order'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('b-preview-wrap').style.display = 'none';
+    loadBanner(); loadDashboard();
+  } catch (e) { toast('Gagal menyimpan: ' + e.message, 'error'); }
+  finally { setBtnLoading(btn, false, '<img src="icon/tambah.png" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'"> Simpan Banner'); }
+}
+/* ── EDIT BANNER ── */
+async function openEditBanner(id) {
+  const { data, error } = await db.from('banner').select('*').eq('id', id).single();
+  if (error) return toast('Gagal ambil data: ' + error.message, 'error');
+
+  document.getElementById('eb-id').value     = data.id;
+  document.getElementById('eb-url').value    = data.image_url || '';
+  document.getElementById('eb-alt').value    = data.alt_text || '';
+  document.getElementById('eb-order').value  = data.sort_order || 1;
+  document.getElementById('eb-status').value = data.is_active ? 'true' : 'false';
+
+  const prev = document.getElementById('eb-preview');
+  if (data.image_url) { prev.src = data.image_url; prev.style.display = 'block'; }
+  else { prev.style.display = 'none'; }
+
+  document.querySelectorAll('#banner-body tr').forEach(r => r.classList.remove('editing-row'));
+  const row = document.getElementById('brow-' + id);
+  if (row) row.classList.add('editing-row');
+
+  document.getElementById('modal-edit-banner').classList.add('show');
+}
+
+function updateEditBannerPreview() {
+  const url  = document.getElementById('eb-url').value.trim();
+  const prev = document.getElementById('eb-preview');
+  if (url) { prev.src = url; prev.style.display = 'block'; }
+  else { prev.style.display = 'none'; }
+}
+
+async function saveEditBanner() {
+  const id         = parseInt(document.getElementById('eb-id').value);
+  const image_url  = document.getElementById('eb-url').value.trim();
+  const alt_text   = document.getElementById('eb-alt').value.trim();
+  const sort_order = parseInt(document.getElementById('eb-order').value) || 1;
+  const is_active  = document.getElementById('eb-status').value === 'true';
+
+  if (!image_url) return toast('URL gambar wajib diisi!', 'error');
+
+  const btn = document.getElementById('btn-save-banner');
+  setBtnLoading(btn, true, 'Menyimpan...');
+  try {
+    const { error } = await db.from('banner').update({ image_url, alt_text, sort_order, is_active }).eq('id', id);
+    if (error) throw error;
+    toast('Banner berhasil diperbarui!');
+    closeModal('banner');
+    loadBanner(); loadDashboard();
+  } catch (e) {
+    toast('Gagal simpan: ' + e.message, 'error');
+  } finally {
+    setBtnLoading(btn, false, '<img src="icon/edit.png" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'"> Simpan Perubahan');
+  }
+}
+// ═══════════════════════════════════════════
+// PINDAHKAN JADWAL KE PERTANDINGAN SELESAI
+// ═══════════════════════════════════════════
+async function pindahkanKeHasil(jadwalId) {
+
+  const skor = prompt('Masukkan SKOR AKHIR pertandingan ini:\n(Format: 2 - 1)');
+  if (skor === null) return;
+  if (!skor.trim()) {
+    toast('Skor tidak boleh kosong!', 'error');
+    return;
+  }
+
+  const { data: jadwal, error: fetchError } = await db
+    .from('jadwal')
+    .select('*')
+    .eq('id', jadwalId)
+    .single();
+
+  if (fetchError) {
+    toast('Gagal mengambil data jadwal: ' + fetchError.message, 'error');
+    return;
+  }
+
+  const parts = (jadwal.match_name || '').split(/ vs /i);
+  const homeName = parts[0]?.trim() || jadwal.match_name || '';
+  const awayName = parts[1]?.trim() || '';
+
+  const dataSelesai = {
+    time       : jadwal.time || '',
+    league     : jadwal.league,
+    match_name : jadwal.match_name,
+    home       : homeName,
+    away       : awayName,
+    score      : skor.trim(),
+    home_logo  : jadwal.home_logo || null,
+    away_logo  : jadwal.away_logo || null,
+    sort_order : jadwal.sort_order || null,
+    prob       : jadwal.prob || null,
+    finished_at: new Date().toISOString(),
+  };
+
+  const { error: insertError } = await db
+    .from('pertandingan_selesai')
+    .insert([dataSelesai]);
+
+  if (insertError) {
+    toast('Gagal menyimpan ke Pertandingan Selesai: ' + insertError.message, 'error');
+    return;
+  }
+
+  const { error: deleteError } = await db
+    .from('jadwal')
+    .delete()
+    .eq('id', jadwalId);
+
+  if (deleteError) {
+    toast('Data tersimpan, tapi gagal hapus dari Jadwal: ' + deleteError.message, 'error');
+    return;
+  }
+
+  toast('Pertandingan berhasil dipindahkan ke Pertandingan Selesai!', 'success');
+  loadJadwal();
+  loadPertandinganSelesaiAdmin();
+  loadDashboard();
+}
+
+// ═══════════════════════════════════════════
+// SHARED CRUD
+// ═══════════════════════════════════════════
+async function deleteRow(table, id, bodyId, reloadFn) {
+  if (!confirm('Yakin ingin menghapus data ini?')) return;
+  const { error } = await db.from(table).delete().eq('id', id);
+  if (error) return toast('Gagal hapus: ' + error.message, 'error');
+  toast('Data berhasil dihapus.');
+  reloadFn(); loadDashboard();
+}
+
+async function toggleField(table, id, field, currentVal, reloadFn) {
+  const update = {}; update[field] = !currentVal;
+  const { error } = await db.from(table).update(update).eq('id', id);
+  if (error) return toast('Gagal update: ' + error.message, 'error');
+  toast('Status diperbarui.');
+  reloadFn(); loadDashboard();
+}
+
+// ═══════════════════════════════════════════
+// MODAL HELPERS
+// ═══════════════════════════════════════════
+function closeModal(type) {
+  document.getElementById('modal-edit-' + type).classList.remove('show');
+  const bodyMap = { jadwal: 'jadwal-body', hasil: 'hasil-body', marquee: 'marquee-body', banner: 'banner-body', selesai: 'selesai-body' };
+  if (bodyMap[type]) {
+    document.querySelectorAll('#' + bodyMap[type] + ' tr').forEach(r => r.classList.remove('editing-row'));
+  }
+}
+
+document.querySelectorAll('.edit-modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) {
+      const type = this.id.replace('modal-edit-', '');
+      closeModal(type);
+    }
+  });
+});
+
+// ═══════════════════════════════════════════
+// LAPORAN BUG & SARAN
+// ═══════════════════════════════════════════
+async function loadLaporan() {
+  const body = document.getElementById('laporan-body');
+  if (!body) return;
+  try {
+    const { data, error } = await db.from('laporan_bug').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data?.length) {
+      body.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div>Belum ada laporan</div></div></td></tr>';
+      return;
+    }
+    body.innerHTML = data.map(r => {
+      const tgl   = r.created_at ? new Date(r.created_at).toLocaleString('id-ID', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+      const isPending = r.status === 'Pending';
+      const tipeBadge = {
+        'Bug Layout'  : 'badge-EPL',
+        'Error Data'  : 'badge-LIGA1',
+        'Saran Fitur' : 'badge-UCL',
+      }[r.tipe] || 'badge-default';
+      return `<tr id="lrow-${r.id}">
+        <td style="white-space:nowrap;font-size:12px;color:var(--text-muted);">${tgl}</td>
+        <td style="font-weight:600;">${r.nama || 'Anonim'}</td>
+        <td><span class="badge ${tipeBadge}">${r.tipe || '—'}</span></td>
+        <td style="font-size:13px;max-width:300px;word-break:break-word;">${r.pesan || '—'}</td>
+        <td>
+          <span class="badge ${isPending ? 'badge-inactive' : 'badge-active'}">
+            ${isPending ? 'Pending' : 'Selesai'}
+          </span>
+        </td>
+        <td><div class="td-actions">
+          ${isPending
+            ? `<button class="btn btn-ghost btn-xs" onclick="tandaiSelesai(${r.id})"><img src="icon/aktif.png" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Selesai</button>`
+            : `<button class="btn btn-ghost btn-xs" style="opacity:.5;" disabled><img src="icon/aktif.png" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Selesai</button>`
+          }
+          <button class="btn btn-danger btn-xs" onclick="hapusLaporan(${r.id})">
+  <img src="icon/delete.png" alt="Hapus" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Hapus
+</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    body.innerHTML = `<tr><td colspan="6" style="color:var(--danger);text-align:center;padding:20px;">Error: ${e.message}</td></tr>`;
+  }
+}
+
+async function tandaiSelesai(id) {
+  const { error } = await db.from('laporan_bug').update({ status: 'Selesai' }).eq('id', id);
+  if (error) return toast('Gagal update: ' + error.message, 'error');
+  toast('Laporan ditandai selesai!');
+  loadLaporan();
+}
+
+async function hapusLaporan(id) {
+  if (!confirm('Yakin hapus laporan ini?')) return;
+  const { error } = await db.from('laporan_bug').delete().eq('id', id);
+  if (error) return toast('Gagal hapus: ' + error.message, 'error');
+  toast('Laporan dihapus.');
+  loadLaporan();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.edit-modal-overlay.show').forEach(el => {
+      const type = el.id.replace('modal-edit-', '');
+      closeModal(type);
+    });
+  }
+});
+
+// ═══════════════════════════════════════════
+// REALTIME — LAPORAN BUG
+// ═══════════════════════════════════════════
+db.channel('realtime-laporan')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'laporan_bug' }, (payload) => {
+    console.log('Realtime laporan event:', payload);
+    loadLaporan();
+    loadDashboard();
+  })
+  .subscribe((status) => {
+    console.log('Status channel laporan:', status);
+  });
+
+// ═══════════════════════════════════════════
+// PERTANDINGAN SELESAI — ADMIN CRUD
+// ═══════════════════════════════════════════
+async function loadPertandinganSelesaiAdmin() {
+  const body = document.getElementById('selesai-body');
+  if (!body) return;
+  try {
+    const { data, error } = await db.from('pertandingan_selesai').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data?.length) {
+      body.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div>Belum ada data</div></div></td></tr>';
+      return;
+    }
+    body.innerHTML = data.map((r, index) => {
+      const home = r.match_name ? (r.match_name.split(/ vs /i)[0]?.trim() || '—') : (r.home || '—');
+      const away = r.match_name ? (r.match_name.split(/ vs /i)[1]?.trim() || '—') : (r.away || '—');
+      return `<tr id="psrow-${r.id}">
+        <td style="text-align:center;font-weight:700;color:var(--p-green-dark);">${index + 1}</td>
+        <td style="white-space:nowrap;font-weight:700;color:var(--p-green-dark);">${r.time || r.match_time || '—'}</td>
+        <td>${leagueBadge(r.league)}</td>
+        <td>${renderLogoCell(r.home_logo, home)}</td>
+        <td>${renderLogoCell(r.away_logo, away)}</td>
+        <td style="font-family:'Barlow Condensed';font-size:18px;font-weight:800;color:var(--p-green-dark);text-align:center;white-space:nowrap;">${r.score || '—'}</td>
+       <td><div class="td-actions">
+          <button class="btn btn-edit btn-xs" onclick="openEditSelesai(${r.id})">
+  <img src="icon/edit.png" alt="Edit" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Edit
+</button>
+
+          <select class="btn-xs" style="border:1px solid var(--p-green-border);border-radius:6px;padding:5px 6px;background:var(--surface2);color:var(--text);font-size:11px;cursor:pointer;" onchange="geserTanggalSelesai(${r.id}, this.value)">
+  <option value="">Geser ke...</option>
+  <option value="0">Hari Ini</option>
+  <option value="1">Kemarin</option>
+  <option value="2">2 Hari Lalu</option>
+</select>
+          <button class="btn btn-danger btn-xs" onclick="deleteRow('pertandingan_selesai',${r.id},'selesai-body',loadPertandinganSelesaiAdmin)">
+  <img src="icon/delete.png" alt="Hapus" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'"> Hapus
+</button>
+        </div></td> 
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    body.innerHTML = `<tr><td colspan="7" style="color:var(--danger);text-align:center;padding:20px;">Error: ${e.message}</td></tr>`;
+  }
+}
+
+async function addPertandinganSelesai() {
+  const time       = document.getElementById('ps-time').value.trim();
+  const league     = getLeagueValue('ps');
+  const home       = document.getElementById('ps-home').value.trim();
+  const away       = document.getElementById('ps-away').value.trim();
+  const home_logo  = document.getElementById('ps-home-logo').value.trim() || null;
+  const away_logo  = document.getElementById('ps-away-logo').value.trim() || null;
+  const score      = document.getElementById('ps-score').value.trim();
+  const sort_order = parseInt(document.getElementById('ps-sort').value) || null;
+
+  if (!time)   return toast('Waktu wajib diisi!', 'error');
+  if (!league) return toast('Liga wajib diisi!', 'error');
+  if (!home)   return toast('Nama tim tuan rumah wajib diisi!', 'error');
+  if (!away)   return toast('Nama tim tamu wajib diisi!', 'error');
+  if (!score)  return toast('Skor akhir wajib diisi!', 'error');
+
+  const match_name = `${home} vs ${away}`;
+
+  const btn = document.getElementById('btn-add-selesai');
+  setBtnLoading(btn, true, 'Menyimpan...');
+  try {
+    const { error } = await db.from('pertandingan_selesai').insert([{
+      time, league, match_name, home, away, home_logo, away_logo, score, sort_order
+    }]);
+    if (error) throw error;
+    toast('Data berhasil disimpan!');
+    resetSelesaiForm();
+    loadPertandinganSelesaiAdmin();
+ } catch (e) {
+    toast('Gagal menyimpan: ' + e.message, 'error');
+  } finally {
+    setBtnLoading(btn, false, '<img src="icon/tambah.png" style="width:24px;height:24px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'"> Simpan Data');
+  }
+}
+
+function resetSelesaiForm() {
+  ['ps-time','ps-home','ps-away','ps-home-logo','ps-away-logo','ps-score','ps-custom-league','ps-sort'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('ps-league').value = 'EPL';
+  document.getElementById('ps-custom-wrap').style.display = 'none';
+}
+
+async function openEditSelesai(id) {
+  const { data, error } = await db.from('pertandingan_selesai').select('*').eq('id', id).single();
+  if (error) return toast('Gagal ambil data: ' + error.message, 'error');
+
+  const home = data.match_name ? (data.match_name.split(/ vs /i)[0]?.trim() || '') : (data.home || '');
+  const away = data.match_name ? (data.match_name.split(/ vs /i)[1]?.trim() || '') : (data.away || '');
+
+  document.getElementById('eps-id').value        = data.id;
+  document.getElementById('eps-time').value      = data.time || data.match_time || '';
+  document.getElementById('eps-league').value    = data.league || '';
+  document.getElementById('eps-home').value      = home;
+  document.getElementById('eps-away').value      = away;
+  document.getElementById('eps-home-logo').value = data.home_logo || '';
+  document.getElementById('eps-away-logo').value = data.away_logo || '';
+  document.getElementById('eps-score').value     = data.score || '';
+  document.getElementById('eps-sort').value      = data.sort_order ?? '';
+
+  document.querySelectorAll('#selesai-body tr').forEach(r => r.classList.remove('editing-row'));
+  const row = document.getElementById('psrow-' + id);
+  if (row) row.classList.add('editing-row');
+
+  document.getElementById('modal-edit-selesai').classList.add('show');
+}
+
+async function saveEditSelesai() {
+  const id         = parseInt(document.getElementById('eps-id').value);
+  const time       = document.getElementById('eps-time').value.trim();
+  const league     = document.getElementById('eps-league').value.trim().toUpperCase();
+  const home       = document.getElementById('eps-home').value.trim();
+  const away       = document.getElementById('eps-away').value.trim();
+  const home_logo  = document.getElementById('eps-home-logo').value.trim() || null;
+  const away_logo  = document.getElementById('eps-away-logo').value.trim() || null;
+  const score      = document.getElementById('eps-score').value.trim();
+  const sort_order = parseInt(document.getElementById('eps-sort').value) || null;
+
+  if (!time || !league || !home || !away || !score) return toast('Semua field wajib diisi!', 'error');
+
+  const match_name = `${home} vs ${away}`;
+
+  const btn = document.getElementById('btn-save-selesai');
+  setBtnLoading(btn, true, 'Menyimpan...');
+  try {
+    const { error } = await db.from('pertandingan_selesai').update({
+            time,
+            league,
+            match_name,
+            home,
+            away,
+            home_logo,
+            away_logo,
+            score,
+            sort_order
+        }).eq('id', id);   
+    if (error) throw error;
+    toast('Data berhasil diperbarui!');
+    closeModal('selesai');
+    loadPertandinganSelesaiAdmin();
+  } catch (e) {
+    toast('Gagal simpan: ' + e.message, 'error');
+  } finally {
+    setBtnLoading(btn, false, '<img src="icon/edit.png" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display=\'none\'"> Simpan Perubahan');
+  }
+}
+// Realtime listener
+db.channel('realtime-pertandingan-selesai')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'pertandingan_selesai' }, () => {
+    loadPertandinganSelesaiAdmin();
+  })
+  .subscribe();
+// ═══════════════════════════════════════════
+// KONTROL ADMIN: GESER TANGGAL HISTORI
+// ═══════════════════════════════════════════
+async function geserTanggalSelesai(id, offsetDays) {
+  if (offsetDays === '') return;
+
+  const offset = parseInt(offsetDays);
+  const target = new Date();
+  target.setDate(target.getDate() - offset);
+
+  target.setUTCHours(5, 0, 0, 0);
+
+  const { error } = await db
+    .from('pertandingan_selesai')
+    .update({ finished_at: target.toISOString() })
+    .eq('id', id);
+
+  if (error) return toast('Gagal menggeser tanggal: ' + error.message, 'error');
+
+  const labels = { 0: 'Hari Ini', 1: 'Kemarin', 2: '2 Hari Lalu' };
+  toast(`Data dipindahkan ke kelompok "${labels[offset]}"`, 'success');
+  loadPertandinganSelesaiAdmin();
+}
+
+// ═══════════════════════════════════════════
+// BERSIHKAN DATA LEBIH DARI 2 HARI
+// ═══════════════════════════════════════════
+async function bersihkanDataLama() {
+  if (!confirm('Hapus semua data Pertandingan Selesai yang lebih dari 2 hari lalu?')) return;
+
+  const threshold = new Date();
+  threshold.setDate(threshold.getDate() - 2);
+  threshold.setUTCHours(0, 0, 0, 0);
+
+  const { error, count } = await db
+    .from('pertandingan_selesai')
+    .delete({ count: 'exact' })
+    .lt('finished_at', threshold.toISOString());
+
+  if (error) return toast('Gagal membersihkan data: ' + error.message, 'error');
+
+  toast(`${count ?? 0} data lama berhasil dihapus.`, 'success');
+  loadPertandinganSelesaiAdmin();
+  loadDashboard();
+}
+
+</script>
+</body>
+</html>
