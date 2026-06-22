@@ -1,0 +1,13 @@
+# Aturan perayapan untuk semua robot mesin pencari
+User-agent: *
+
+# HALAMAN PRIVASI / PANEL (Dilarang Keras Muncul di Google)
+Disallow: /admin.html
+Disallow: /login.html
+
+# HANYA HALAMAN UTAMA YANG DIIZINKAN UNTUK UMUM
+Allow: /$
+Allow: /assets/
+
+# Jalur Peta Situs Resmi PIKAT4D
+Sitemap: https://prediksipikat4d.gopaybaru55.workers.dev/sitemap.xml
