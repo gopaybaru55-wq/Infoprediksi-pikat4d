@@ -982,6 +982,39 @@ tbody tr:hover { background: #f3fdf2; }
     .fsn-bar           { padding: 8px 0 12px; }
     .floating          { bottom: 80px; }
 }
+/* ══ TOMBOL MASUK TENGAH (FAB) — PIKAT4D HIJAU ══ */
+.floating-football-btn {
+    position: relative;
+    top: -18px;
+    width: 65px;
+    height: 65px;
+    background: #22c55e;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35), 0 0 0 3px #ffffff;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 0;
+    z-index: 9999;
+}
+.floating-football-btn:hover {
+    transform: translateY(-4px) scale(1.08);
+    box-shadow: 0 8px 24px rgba(34,197,94,0.6), 0 0 0 3px #ffffff;
+}
+.floating-football-btn:active {
+    transform: scale(0.9);
+}
+@media (max-width: 430px) {
+    .floating-football-btn {
+        width: 58px;
+        height: 58px;
+        top: -16px;
+    }
+}
 
 /* ══ MODAL LAPORAN BUG ══ */
 .bug-modal-overlay {
@@ -2256,6 +2289,20 @@ textarea.bug-field { resize: vertical; min-height: 90px; }
         <li style="--fsn-i:#0c7d46; --fsn-j:#b8f23c" onclick="fsnShare()" role="button" aria-label="Bagikan Halaman Ini">
             <span class="fsn-icon"><ion-icon name="share-social-outline"></ion-icon></span>
             <span class="fsn-title">Bagikan</span>
+        </li>
+<!-- ══ TOMBOL MASUK TENGAH (FAB) PIKAT4D ══ -->
+        <li style="background:transparent;box-shadow:none;overflow:visible;width:auto;height:auto;border:none;" role="none">
+            <a href="https://rinjaniman.com/"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="Masuk ke PIKAT4D"
+               class="floating-football-btn">
+                <img src="icons/login.png"
+                     alt="Masuk"
+                     style="width:28px;height:28px;object-fit:contain;"
+                     onerror="this.style.display='none'">
+                <span style="font-size:8px;font-weight:800;color:#ffffff;letter-spacing:0.5px;text-transform:uppercase;font-family:'Barlow',sans-serif;line-height:1;">MASUK</span>
+            </a>
         </li>
         <li style="--fsn-i:#7ed957; --fsn-j:#0f9d58" onclick="focusSearchBar()" role="button" aria-label="Cari Tim atau Liga">
             <span class="fsn-icon"><ion-icon name="search-outline"></ion-icon></span>
