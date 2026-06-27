@@ -23,7 +23,7 @@
     <meta name="robots" content="index, follow">
 
     <!-- 5. Canonical URL -->
-    <link rel="canonical" https://prediksipikat4d.gopaybaru55.workers.dev/">
+    <link rel="canonical" href="https://prediksipikat4d.gopaybaru55.workers.dev/">
 
     <!-- 6. Author & Language -->
     <meta name="author" content="PIKAT4D">
@@ -1730,9 +1730,9 @@ textarea.bug-field { resize: vertical; min-height: 90px; }
         <!-- ══ SECTION: JADWAL (tab 1) ══ -->
         <div id="tabcontent-jadwal">
         <!-- LOG SEO TAMBAHAN: section-title diberi tag h1 tersirat melalui aria -->
-        <div class="section-title title-with-icon" role="heading" aria-level="1">
-            <img src="icons/persen.png" class="title-icon" alt="Analisa Peluang" onerror="this.style.display='none';">ANALISA PELUANG
-        </div>
+        <h1 class="section-title title-with-icon">
+    <img src="icons/persen.png" class="title-icon" alt="Analisa Peluang" onerror="this.style.display='none';">ANALISA PELUANG
+</h1>
         <div class="tab-filter" id="tabFilter">
             <button class="tab-btn active" onclick="filterLeague('ALL')">SEMUA</button>
         </div>
@@ -2905,14 +2905,22 @@ function renderSearchRecent() {
     }
     section.style.display = 'block';
 
-   list.innerHTML = history.map(term => `
-        <div class="search-recent-item" onclick="applySearchTerm('${term.replace(/'/g, "\\'")}')">
+   list.innerHTML = history.map((term, idx) => `
+        <div class="search-recent-item" data-idx="${idx}">
             <img src="icons/waktu.png" class="search-row-logo" alt="${term}" onerror="this.style.display='none'">
             <span class="search-row-name">${term}</span>
             <span class="search-row-star">★</span>
-            <button class="search-row-remove" onclick="event.stopPropagation(); removeSearchHistoryItem('${term.replace(/'/g, "\\'")}')">✕</button>
+            <button class="search-row-remove" data-remove="${idx}">✕</button>
         </div>
     `).join('');
+
+    list.querySelectorAll('.search-recent-item').forEach((el, idx) => {
+        el.addEventListener('click', () => applySearchTerm(history[idx]));
+        el.querySelector('.search-row-remove').addEventListener('click', (e) => {
+            e.stopPropagation();
+            removeSearchHistoryItem(history[idx]);
+        });
+    });
 }
 // ── Suggested: tim/liga populer dari data jadwal yang sudah dimuat ──
 function renderSearchSuggested() {
@@ -3298,22 +3306,7 @@ function fsnToggleLike(element) {
         }
     });
 
-    // 3. Fitur Proteksi Debugger Otomatis (Membuat Browser Freeze/Lag Jika Nekat Buka Inspect via Menu Browser)
-    (function() {
-        const preventDebug = function() {
-            try {
-                (function() {
-                    (function a() {
-                        debugger;
-                        setTimeout(a, 50);
-                    })();
-                })();
-            } catch (err) {}
-        };
-        
-        // Jalankan proteksi secara berkala
-        setInterval(preventDebug, 200);
-    })();
+    
 // ── PWA INSTALL HANDLER ──
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
