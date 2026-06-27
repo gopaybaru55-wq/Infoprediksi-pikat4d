@@ -701,6 +701,136 @@ tbody tr:hover { background: #f3fdf2; }
 }
 @keyframes rotate { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
 
+/* ══ ANALISA PELUANG — MATCH ROW CARDS ══ */
+.analisa-list-wrapper {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid var(--p4-border-strong);
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(15,157,88,0.08);
+    margin-bottom: 24px;
+}
+.match-row {
+    display: flex; align-items: center;
+    padding: 14px 16px; border-bottom: 1px solid rgba(15,157,88,0.07);
+    gap: 12px; background: #ffffff; transition: background 0.15s; position: relative;
+}
+.match-row:last-child { border-bottom: none; }
+.match-row:hover { background: #f3fdf2; }
+.match-row-time { flex-shrink: 0; min-width: 52px; text-align: center; }
+.match-row-time .time-val { font-size: 13px; font-weight: 800; color: #1c1c1c; line-height: 1.2; }
+.match-row-time .time-unit { font-size: 9px; color: #999999; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+.match-row-center { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.match-row-team { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+.match-row-team.home { justify-content: flex-end; }
+.match-row-team.away { justify-content: flex-start; }
+.match-row-team .team-name { font-size: 13px; font-weight: 700; color: #1c1c1c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+.match-row-team.home .team-name { text-align: right; }
+.match-row-team.away .team-name { text-align: left; }
+.match-row-flag { width: 26px; height: 18px; object-fit: cover; border-radius: 2px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.08); }
+.match-row-flag-placeholder { width: 26px; height: 18px; background: #f0f0f0; border-radius: 2px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.match-row-prob-box { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 110px; max-width: 140px; }
+.match-row-prob-values { display: flex; align-items: center; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 800; color: #1c1c1c; line-height: 1; white-space: nowrap; }
+.match-row-prob-values .prob-h { color: #0c7d46; }
+.match-row-prob-values .prob-d { color: #555555; }
+.match-row-prob-values .prob-a { color: #e53e3e; }
+.match-row-prob-values .prob-sep { color: #cccccc; font-size: 13px; margin: 0 3px; font-weight: 400; }
+.match-row-prob-labels { display: flex; align-items: center; font-size: 9px; font-weight: 700; color: #888888; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+.match-row-prob-labels .plbl-h { color: #0c7d46; }
+.match-row-prob-labels .plbl-d { color: #555555; }
+.match-row-prob-labels .plbl-a { color: #e53e3e; }
+.match-row-prob-labels .plbl-sep { color: #cccccc; margin: 0 3px; font-weight: 400; }
+.match-row-prob-bar { display: flex; height: 3px; border-radius: 2px; overflow: hidden; width: 100%; gap: 1px; }
+.match-row-prob-bar .bar-h { background: #0c7d46; border-radius: 2px 0 0 2px; }
+.match-row-prob-bar .bar-d { background: #cccccc; }
+.match-row-prob-bar .bar-a { background: #e53e3e; border-radius: 0 2px 2px 0; }
+.match-row-right { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; min-width: 90px; }
+.match-row-meta .meta-league { display: block; font-weight: 700; color: #0c7d46; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+.live-stream-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #0f9d58; color: #ffffff; text-decoration: none;
+    padding: 4px 8px; border-radius: 20px; font-size: 9px; font-weight: 800;
+    letter-spacing: 0.3px; text-transform: uppercase; white-space: nowrap;
+    transition: background 0.2s, transform 0.15s; border: none; cursor: pointer;
+    font-family: 'Barlow', sans-serif;
+}
+.live-stream-btn:hover { background: #0c7d46; transform: scale(1.04); color: #ffffff; }
+.live-stream-btn .live-dot { width: 6px; height: 6px; background: #ffffff; border-radius: 50%; animation: livePulse 1.2s ease-in-out infinite; flex-shrink: 0; }
+@keyframes livePulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+.live-stream-btn.disabled { background: #cccccc; color: #888888; cursor: not-allowed; pointer-events: none; }
+.live-stream-btn.disabled .live-dot { background: #999999; animation: none; }
+.analisa-state-msg { text-align: center; padding: 36px 20px; color: #999999; font-size: 14px; }
+
+/* ══ SELESAI — TAMPILAN BARIS MINIMALIS ══ */
+.selesai-list-wrapper {
+    background: #ffffff; border-radius: 14px;
+    border: 1px solid var(--p4-border-strong); overflow: hidden;
+    box-shadow: 0 4px 16px rgba(15,157,88,0.08); margin-bottom: 24px;
+}
+.selesai-col-header {
+    display: flex; align-items: center; padding: 7px 16px;
+    background: #f3fdf2; border-bottom: 1.5px solid rgba(15,157,88,0.12); gap: 8px;
+}
+.selesai-col-header .sch-waktu {
+    flex-shrink: 0; min-width: 52px; font-size: 11px; font-weight: 700;
+    color: #6b7280; text-transform: uppercase; letter-spacing: 0.8px;
+    display: flex; align-items: center; gap: 4px;
+}
+.selesai-col-header .sch-center {
+    flex: 1; font-size: 11px; font-weight: 700; color: #6b7280;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    text-align: center; display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+.selesai-col-header .sch-skor {
+    flex-shrink: 0; min-width: 90px; font-size: 11px; font-weight: 700;
+    color: #6b7280; text-transform: uppercase; letter-spacing: 0.8px;
+    text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 4px;
+}
+.selesai-row {
+    display: flex; align-items: center; padding: 13px 16px;
+    border-bottom: 1px solid rgba(15,157,88,0.06); gap: 10px;
+    background: #ffffff; transition: background 0.15s;
+}
+.selesai-row:last-child { border-bottom: none; }
+.selesai-row:hover { background: #f3fdf2; }
+.selesai-row-time { flex-shrink: 0; min-width: 52px; text-align: center; }
+.selesai-row-time .sr-time-val { font-size: 12px; font-weight: 800; color: #1c1c1c; line-height: 1.2; }
+.selesai-row-time .sr-time-unit { font-size: 9px; color: #999999; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+.selesai-row-center { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.selesai-row-team { display: flex; align-items: center; gap: 5px; flex: 1; min-width: 0; }
+.selesai-row-team.sr-home { justify-content: flex-end; }
+.selesai-row-team.sr-away { justify-content: flex-start; }
+.selesai-row-team .sr-team-name { font-size: 12px; font-weight: 700; color: #1c1c1c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+.selesai-row-team.sr-home .sr-team-name { text-align: right; }
+.selesai-row-team.sr-away .sr-team-name { text-align: left; }
+.selesai-row-flag { width: 24px; height: 16px; object-fit: cover; border-radius: 2px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.07); }
+.selesai-row-flag-ph { width: 24px; height: 16px; background: #f0f0f0; border-radius: 2px; flex-shrink: 0; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+.selesai-row-ft { flex-shrink: 0; font-size: 9px; font-weight: 700; color: #aaaaaa; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; min-width: 22px; }
+.selesai-row-score { flex-shrink: 0; min-width: 90px; text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+.selesai-row-score .sr-score-val { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; color: #0f9d58; line-height: 1; letter-spacing: 1px; }
+.selesai-row-score .sr-score-lbl { font-size: 8px; font-weight: 700; color: #aaaaaa; text-transform: uppercase; letter-spacing: 0.5px; }
+.selesai-state-msg { text-align: center; padding: 28px 16px; color: #999999; font-size: 13px; }
+
+@media (max-width: 480px) {
+    .match-row { padding: 11px 12px; gap: 8px; }
+    .match-row-time { min-width: 42px; }
+    .match-row-team .team-name { font-size: 11px; max-width: 70px; }
+    .match-row-flag { width: 20px; height: 14px; }
+    .match-row-prob-box { min-width: 90px; max-width: 110px; }
+    .match-row-prob-values { font-size: 12px; }
+    .match-row-right { min-width: 72px; }
+    .selesai-row { padding: 10px 12px; gap: 7px; }
+    .selesai-row-time { min-width: 42px; }
+    .selesai-row-time .sr-time-val { font-size: 10px; }
+    .selesai-row-team .sr-team-name { font-size: 11px; max-width: 70px; }
+    .selesai-row-flag { width: 18px; height: 12px; }
+    .selesai-row-score { min-width: 72px; }
+    .selesai-row-score .sr-score-val { font-size: 18px; }
+    .selesai-col-header .sch-waktu, .selesai-col-header .sch-center, .selesai-col-header .sch-skor { font-size: 9px; }
+    .selesai-col-header .sch-waktu { min-width: 42px; }
+    .selesai-col-header .sch-skor { min-width: 72px; }
+}
+
 /* LOADING */
 .state-msg { text-align: center; padding: 30px; color: #999999; font-size: 14px; }
 .loader-ring {
@@ -1607,38 +1737,12 @@ textarea.bug-field { resize: vertical; min-height: 90px; }
             <button class="tab-btn active" onclick="filterLeague('ALL')">SEMUA</button>
         </div>
 
-        <div class="table-scroll-hint">
-            <span>👆</span> Geser tabel ke samping
-        </div>
-
-        <div class="table-container">
-            <div class="table-scroll-wrapper">
-                <table>
-                   <thead>
-    <tr>
-        <th scope="col" style="width:40px;text-align:center;">
-            <img src="icons/no.png" alt="No" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">No
-        </th>
-        <th scope="col">
-            <img src="icons/waktu.png" alt="Waktu" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Waktu
-        </th>
-        <th scope="col">
-            <img src="icons/liga.png" alt="Liga" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Liga
-        </th>
-        <th scope="col">
-            <img src="icons/pertandingan.png" alt="Pertandingan" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Pertandingan
-        </th>
-        <th scope="col">
-            <img src="icons/persen.png" alt="Win Prob" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Win Prob 
-        </th>
-    </tr>
-</thead>
-                  <tbody id="scheduleBody">
-                        <tr><td colspan="5">
-                            <div class="state-msg"><span class="loader-ring"></span>Memuat jadwal...</div>
-                        </td></tr>
-                    </tbody>
-                </table>
+        <!-- Wrapper daftar pertandingan — card rows minimalis -->
+        <div class="analisa-list-wrapper" id="analisaListWrapper">
+            <div id="scheduleBody">
+                <div class="analisa-state-msg">
+                    <span class="loader-ring"></span>Memuat jadwal...
+                </div>
             </div>
         </div>
 
@@ -1685,106 +1789,45 @@ textarea.bug-field { resize: vertical; min-height: 90px; }
     </main>
         </div><!-- /tabcontent-prediksi -->
 
-       <!-- ══ SECTION: PERTANDINGAN SELESAI (tab 3 — 3 TABEL HISTORI) ══ -->
+       <!-- ══ SECTION: PERTANDINGAN SELESAI (tab 3 — 3 GRUP HISTORI MINIMALIS) ══ -->
         <div id="tabcontent-selesai" style="display:none;">
             <div class="section-title title-with-icon">
                 <img src="icons/pertandingan.png" class="title-icon" alt="Pertandingan Selesai" onerror="this.style.display='none';">SELESAI
             </div>
-            <!-- TABEL 1: HARI INI -->
-            <div class="ep-card-title" style="font-size:16px;margin-top:0;">Pertandingan Hari Ini</div>
-            <div class="table-scroll-hint"><span>👆</span> Geser tabel ke samping</div>
-            <div class="table-container">
-                <div class="table-scroll-wrapper">
-                    <table>
-                        <thead>
-    <tr>
-        <th scope="col" style="width:40px;text-align:center;">
-            <img src="icons/no.png" alt="No" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">No
-        </th>
-        <th scope="col">
-            <img src="icons/waktu.png" alt="Waktu" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Waktu
-        </th>
-        <th scope="col">
-            <img src="icons/liga.png" alt="Liga" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Liga
-        </th>
-        <th scope="col">
-            <img src="icons/pertandingan.png" alt="Pertandingan" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Pertandingan
-        </th>
-        <th scope="col">
-            <img src="icons/score.png" alt="Skor Akhir" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Hasil Skor Akhir
-        </th>
-    </tr>
-</thead>
-                        <tbody id="selesaiBodyHariIni">
-                            <tr><td colspan="5"><div class="state-msg"><span class="loader-ring"></span>Memuat data...</div></td></tr>
-                        </tbody>
-                    </table>
+
+            <!-- GRUP 1: HARI INI -->
+            <div class="ep-card-title" style="font-size:15px;margin-top:0;margin-bottom:10px;">Pertandingan Hari Ini</div>
+            <div class="selesai-list-wrapper">
+                <div class="selesai-col-header">
+                    <div class="sch-waktu"><img src="icons/waktu.png" style="width:16px;height:16px;vertical-align:middle;" onerror="this.style.display='none'"> WAKTU</div>
+                    <div class="sch-center"><img src="icons/Pertandingan.png" style="width:16px;height:16px;vertical-align:middle;" onerror="this.style.display='none'"> PERTANDINGAN</div>
+                    <div class="sch-skor"><img src="icons/score.png" style="width:16px;height:16px;vertical-align:middle;" onerror="this.style.display='none'"> HASIL SKOR AKHIR</div>
                 </div>
+                <div id="selesaiBodyHariIni"><div class="selesai-state-msg"><span class="loader-ring"></span>Memuat data...</div></div>
             </div>
 
-            <!-- TABEL 2: KEMARIN -->
-            <div class="ep-card-title" style="font-size:16px;">Pertandingan Kemarin</div>
-            <div class="table-scroll-hint"><span>👆</span> Geser tabel ke samping</div>
-            <div class="table-container">
-                <div class="table-scroll-wrapper">
-                    <table>
-                       <thead>
-    <tr>
-        <th scope="col" style="width:40px;text-align:center;">
-            <img src="icons/no.png" alt="No" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">No
-        </th>
-        <th scope="col">
-            <img src="icons/waktu.png" alt="Waktu" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Waktu
-        </th>
-        <th scope="col">
-            <img src="icons/liga.png" alt="Liga" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Liga
-        </th>
-        <th scope="col">
-            <img src="icons/pertandingan.png" alt="Pertandingan" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Pertandingan
-        </th>
-        <th scope="col">
-            <img src="icons/score.png" alt="Skor Akhir" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Hasil Skor Akhir
-        </th>
-    </tr>
-</thead>
-                        <tbody id="selesaiBodyKemarin">
-                            <tr><td colspan="5"><div class="state-msg"><span class="loader-ring"></span>Memuat data...</div></td></tr>
-                        </tbody>
-                    </table>
+            <!-- GRUP 2: KEMARIN -->
+            <div class="ep-card-title" style="font-size:15px;margin-bottom:10px;">Pertandingan Kemarin</div>
+            <div class="selesai-list-wrapper">
+                <div class="selesai-col-header">
+                    <div class="sch-waktu"><img src="icons/waktu.png" style="width:16px;height:16px;vertical-align:middle;" onerror="this.style.display='none'"> WAKTU</div>
+                    <div class="sch-center"><img src="icons/Pertandingan.png" style="width:16px;height:16px;vertical-align:middle;" onerror="this.style.display='none'"> PERTANDINGAN</div>
+                    <div class="sch-skor"><img src="icons/score.png" style="width:16px;height:16px;vertical-align:middle;" onerror="this.style.display='none'"> HASIL SKOR AKHIR</div>
                 </div>
+                <div id="selesaiBodyKemarin"><div class="selesai-state-msg"><span class="loader-ring"></span>Memuat data...</div></div>
             </div>
 
-            <!-- TABEL 3: 2 HARI LALU -->
-            <div class="ep-card-title" style="font-size:16px;">Pertandingan 2 Hari Lalu</div>
-            <div class="table-scroll-hint"><span>👆</span> Geser tabel ke samping</div>
-            <div class="table-container">
-                <div class="table-scroll-wrapper">
-                    <table>
-                        <thead>
-    <tr>
-        <th scope="col" style="width:40px;text-align:center;">
-            <img src="icons/no.png" alt="No" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">No
-        </th>
-        <th scope="col">
-            <img src="icons/waktu.png" alt="Waktu" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Waktu
-        </th>
-        <th scope="col">
-            <img src="icons/liga.png" alt="Liga" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Liga
-        </th>
-        <th scope="col">
-            <img src="icons/pertandingan.png" alt="Pertandingan" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Pertandingan
-        </th>
-        <th scope="col">
-            <img src="icons/score.png" alt="Skor Akhir" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" onerror="this.style.display='none'">Hasil Skor Akhir
-        </th>
-    </tr>
-</thead>
-                        <tbody id="selesaiBodyDuaHariLalu">
-                            <tr><td colspan="5"><div class="state-msg"><span class="loader-ring"></span>Memuat data...</div></td></tr>
-                        </tbody>
-                    </table>
+            <!-- GRUP 3: 2 HARI LALU -->
+            <div class="ep-card-title" style="font-size:15px;margin-bottom:10px;">Pertandingan 2 Hari Lalu</div>
+            <div class="selesai-list-wrapper">
+                <div class="selesai-col-header">
+                    <div class="sch-waktu"><img src="icons/waktu.png" style="width:16px;height:16px;vertical-align:middle;" onerror="this.style.display='none'"> WAKTU</div>
+                    <div class="sch-center"><img src="icons/Pertandingan.png" style="width:16px;height:16px;vertical-align:middle;" onerror="this.style.display='none'"> PERTANDINGAN</div>
+                    <div class="sch-skor"><img src="icons/score.png" style="width:16px;height:16px;vertical-align:middle;" onerror="this.style.display='none'"> HASIL SKOR AKHIR</div>
                 </div>
+                <div id="selesaiBodyDuaHariLalu"><div class="selesai-state-msg"><span class="loader-ring"></span>Memuat data...</div></div>
             </div>
+
         </div><!-- /tabcontent-selesai -->
 
 </div><!-- /#main-content -->
@@ -2576,31 +2619,105 @@ function filterLeague(league) {
 
 function renderTable(data) {
     const body = document.getElementById('scheduleBody');
-    if (!data.length) {
-        body.innerHTML = `<tr><td colspan="5"><div class="state-msg">Tidak ada jadwal tersedia</div></td></tr>`;
+    if (!data || !data.length) {
+        body.innerHTML = `<div class="analisa-state-msg">Tidak ada jadwal tersedia</div>`;
         return;
     }
-    body.innerHTML = data.map((s, i) => {
+
+    // Helper parse prob
+    function parseProb(probStr) {
+        if (!probStr) return null;
+        const nums = probStr.match(/(\d+(?:\.\d+)?)\s*%?/g);
+        if (nums && nums.length >= 3) return { h: parseFloat(nums[0]), d: parseFloat(nums[1]), a: parseFloat(nums[2]) };
+        return null;
+    }
+
+    const colHeader = `
+    <div class="selesai-col-header">
+        <div class="sch-waktu">
+            <img src="icons/waktu.png" style="width:16px;height:16px;vertical-align:middle;" onerror="this.style.display='none'"> WAKTU
+        </div>
+        <div class="sch-center">
+            <img src="icons/Pertandingan.png" style="width:16px;height:16px;vertical-align:middle;" onerror="this.style.display='none'"> PERTANDINGAN &amp; PROBABILITAS WIN (H | D | A)
+        </div>
+        <div class="sch-skor">
+            <img src="icons/live.png" style="width:16px;height:16px;vertical-align:middle;" onerror="this.style.display='none'"> STREAMING
+        </div>
+    </div>`;
+
+    body.innerHTML = colHeader + data.map(s => {
         const parts    = (s.match_name || '').split(/ vs /i);
-        const home     = parts[0]?.trim() || s.match_name || '—';
-        const away     = parts[1]?.trim() || '';
-       const homeLogo = s.home_logo
-            ? `<img src="${s.home_logo}" alt="${home}" style="width:24px;height:24px;object-fit:cover;border-radius:50%;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'">`
-            : '';
-        const awayLogo = s.away_logo
-            ? `<img src="${s.away_logo}" alt="${away}" style="width:24px;height:24px;object-fit:cover;border-radius:50%;vertical-align:middle;margin-left:6px;" onerror="this.style.display='none'">`
-            : '';     
-  
-    return `<tr>
-            <td style="text-align:center;font-weight:700;color:#0c7d46;font-size:13px;">${i + 1}</td>
-            <td style="white-space:nowrap;font-weight:700;color:#1c1c1c;">${s.time || '—'} WIB</td>
-            <td style="color:#1c1c1c;font-weight:bold;">${s.league || '—'}</td>
-            <td style="color:#1c1c1c;">${homeLogo}${home}${away ? ` <span style="color:#1c1c1c;font-weight:800;margin:0 4px;">vs</span> ${away}${awayLogo}` : ''}</td>
-            <td style="font-family:'Barlow Condensed';font-weight:800;color:#1c1c1c;">${s.prob || '—'}</td>
-        </tr>`;
+        const homeName = parts[0]?.trim() || s.match_name || '—';
+        const awayName = parts[1]?.trim() || '—';
+
+        const homeFlagEl = s.home_logo
+            ? `<img class="match-row-flag" src="${s.home_logo}" alt="${homeName}" onerror="this.style.display='none'">`
+            : `<span class="match-row-flag-placeholder">⚽</span>`;
+        const awayFlagEl = s.away_logo
+            ? `<img class="match-row-flag" src="${s.away_logo}" alt="${awayName}" onerror="this.style.display='none'">`
+            : `<span class="match-row-flag-placeholder">⚽</span>`;
+
+        const prob = parseProb(s.prob);
+        let probBlock = '';
+        if (prob) {
+            const hW = Math.max(5, Math.round(prob.h));
+            const dW = Math.max(5, Math.round(prob.d));
+            const aW = Math.max(5, Math.round(prob.a));
+            probBlock = `
+                <div class="match-row-prob-box">
+                    <div class="match-row-prob-values">
+                        <span class="prob-h">${prob.h}%</span>
+                        <span class="prob-sep">|</span>
+                        <span class="prob-d">${prob.d}%</span>
+                        <span class="prob-sep">|</span>
+                        <span class="prob-a">${prob.a}%</span>
+                    </div>
+                    <div class="match-row-prob-labels">
+                        <span class="plbl-h">H</span><span class="plbl-sep">·</span>
+                        <span class="plbl-d">D</span><span class="plbl-sep">·</span>
+                        <span class="plbl-a">A</span>
+                    </div>
+                    <div class="match-row-prob-bar">
+                        <div class="bar-h" style="width:${hW}%"></div>
+                        <div class="bar-d" style="width:${dW}%"></div>
+                        <div class="bar-a" style="width:${aW}%"></div>
+                    </div>
+                </div>`;
+        } else {
+            probBlock = `<div class="match-row-prob-box"><div class="match-row-prob-values" style="font-size:11px;color:#555;">${s.prob || '—'}</div></div>`;
+        }
+
+        const waktuRaw    = formatWaktu(s.time || '');
+        const waktuTampil = (s.match_time_left && s.match_time_left.trim()) ? s.match_time_left.trim() : waktuRaw;
+
+        const hasValidStream = s.stream_url && s.stream_url.trim() && s.is_live === true;
+        const liveBtn = hasValidStream
+            ? `<a class="live-stream-btn" href="${s.stream_url}" target="_blank" rel="noopener noreferrer"><span class="live-dot"></span>LIVE</a>`
+            : `<span class="live-stream-btn disabled"><span class="live-dot"></span>LIVE</span>`;
+
+        return `
+        <div class="match-row" data-league="${(s.league||'').toLowerCase()}" data-match="${(s.match_name||'').toLowerCase()}" data-time="${waktuTampil.toLowerCase()}">
+            <div class="match-row-time">
+                <div class="time-val">${waktuTampil || '—'}</div>
+                <div class="time-unit">WIB</div>
+            </div>
+            <div class="match-row-center">
+                <div class="match-row-team home">
+                    <span class="team-name">${homeName}</span>${homeFlagEl}
+                </div>
+                ${probBlock}
+                <div class="match-row-team away">
+                    ${awayFlagEl}<span class="team-name">${awayName}</span>
+                </div>
+            </div>
+            <div class="match-row-right">
+                ${liveBtn}
+                <div class="match-row-meta"><span class="meta-league">${s.league || '—'}</span></div>
+            </div>
+        </div>`;
     }).join('');
 }
-async function loadHasil() {
+        async function loadHasil() {
     try {
         const { data, error } = await db.from('hasil').select('*').order('sort_order', { ascending: true });
         if (error) throw error;
@@ -2846,12 +2963,11 @@ function runSearchFilter() {
     // Toggle empty state di dropdown hanya berbasis recent+suggested kosong,
     // pencarian aktual tetap menyaring konten halaman (tabel/kartu), bukan dropdown.
 
-    // 1. Filter tabel jadwal (scheduleBody)
-    document.querySelectorAll('#scheduleBody tr').forEach(row => {
+    // 1. Filter daftar jadwal (div.match-row)
+    document.querySelectorAll('#scheduleBody .match-row').forEach(row => {
         const text = row.innerText.toLowerCase();
         const matchTerm   = !term || text.includes(term);
-        const matchFilter = matchSearchFilterCategory(row, currentSearchFilter);
-        row.style.display = (matchTerm && matchFilter) ? '' : 'none';
+        row.style.display = matchTerm ? '' : 'none';
     });
 
     // 2. Filter kartu prediksi (#matches .card)
@@ -2910,45 +3026,62 @@ function switchMainTab(tab) {
 // [BARU] LOAD PERTANDINGAN SELESAI — 3 TABEL HISTORI (Realtime)
 // ═══════════════════════════════════════════════════════
 
-// Helper: render baris tabel untuk satu kelompok data
+// Helper: render baris pertandingan selesai — desain minimalis PIKAT4D
 function renderSelesaiRows(data) {
     if (!data || !data.length) {
-        return `<tr><td colspan="5"><div class="state-msg">Belum ada data</div></td></tr>`;
+        return `<div class="selesai-state-msg">Belum ada data</div>`;
     }
-    return data.map((s, index) => {
-        // Nama tim: prioritas kolom home/away, fallback pecah match_name
+    return data.map(s => {
         let homeName, awayName;
         if (s.home && s.away) {
-            homeName = s.home;
-            awayName = s.away;
+            homeName = s.home; awayName = s.away;
         } else {
             const parts = (s.match_name || '').split(/ vs /i);
             homeName = parts[0]?.trim() || s.match_name || '—';
             awayName = parts[1]?.trim() || '—';
         }
-        // Waktu: baca s.time (kolom utama admin), fallback s.match_time
-        const rawWaktu = s.time || s.match_time || '';
-        const waktu    = formatWaktu(rawWaktu);
 
-        const homeLogo = s.home_logo
-            ? `<img src="${s.home_logo}" alt="${homeName}" style="width:24px;height:24px;object-fit:cover;border-radius:50%;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'">`
-            : '';
-        const awayLogo = s.away_logo
-            ? `<img src="${s.away_logo}" alt="${awayName}" style="width:24px;height:24px;object-fit:cover;border-radius:50%;vertical-align:middle;margin-left:6px;" onerror="this.style.display='none'">`
-            : '';
-return `<tr style="border-bottom:1px solid rgba(15,157,88,0.08);">
-            <td style="text-align:center;font-weight:800;color:#0c7d46;padding:13px 10px;font-size:13px;">${index + 1}</td>
-            <td style="white-space:nowrap;font-weight:700;color:#1c1c1c;padding:13px 10px;font-size:13px;">${waktu ? waktu + ' WIB' : '—'}</td>
-            <td style="color:#1c1c1c;font-weight:700;padding:13px 10px;font-size:13px;">${s.league || '—'}</td>
-            <td style="padding:13px 10px;font-size:13px;color:#1c1c1c;">
-                ${homeLogo}${homeName}
-                <span style="color:#7ed957;font-weight:800;margin:0 6px;">vs</span>
-                ${awayName}${awayLogo}
-            </td>
-            <td style="font-family:'Barlow Condensed';font-weight:800;color:#0f9d58;font-size:22px;padding:13px 10px;text-align:center;">${s.score || '—'}</td>
-        </tr>`;
+        const rawWaktu       = s.time || s.match_time || '';
+        const waktuFormatted = formatWaktu(rawWaktu);
+        const jamKiri        = (s.match_time_left && s.match_time_left.trim()) ? s.match_time_left.trim() : waktuFormatted;
+
+        const homeFlagEl = s.home_logo
+            ? `<img class="selesai-row-flag" src="${s.home_logo}" alt="${homeName}" onerror="this.style.display='none'">`
+            : `<span class="selesai-row-flag-ph">⚽</span>`;
+        const awayFlagEl = s.away_logo
+            ? `<img class="selesai-row-flag" src="${s.away_logo}" alt="${awayName}" onerror="this.style.display='none'">`
+            : `<span class="selesai-row-flag-ph">⚽</span>`;
+
+        let skorTampil = '—';
+        if (s.home_score !== null && s.home_score !== undefined && s.away_score !== null && s.away_score !== undefined) {
+            skorTampil = `${s.home_score} - ${s.away_score}`;
+        } else if (s.score) {
+            skorTampil = s.score;
+        }
+
+        return `
+        <div class="selesai-row">
+            <div class="selesai-row-time">
+                <div class="sr-time-val">${jamKiri || '—'}</div>
+                <div class="sr-time-unit">WIB</div>
+            </div>
+            <div class="selesai-row-center">
+                <div class="selesai-row-team sr-home">
+                    <span class="sr-team-name">${homeName}</span>${homeFlagEl}
+                </div>
+                <div class="selesai-row-ft">FT</div>
+                <div class="selesai-row-team sr-away">
+                    ${awayFlagEl}<span class="sr-team-name">${awayName}</span>
+                </div>
+            </div>
+            <div class="selesai-row-score">
+                <div class="sr-score-val">${skorTampil}</div>
+                <div class="sr-score-lbl">${s.league || ''}</div>
+            </div>
+        </div>`;
     }).join('');
 }
+   
 
 // Helper: ambil tanggal lokal WIB dalam format YYYY-MM-DD
 function getWIBDateString(date) {
