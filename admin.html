@@ -1130,6 +1130,16 @@ Contoh isi: EPL | 2-1 | Sabtu, 06 Jun - 22:00 WIB | Arsenal | https://site.com/l
             <img src="icon/hasil.png" alt="Tambah" style="width:24px;height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display='none'"> Tambah Pertandingan Selesai
           </div>
         </div>
+        <!-- ══ AUTO-FILL SELESAI — PALING ATAS FORM ══ -->
+        <div class="form-group" style="margin-bottom:18px;">
+          <label>⚡ Auto-Fill Hasil Skor (Copas teks AI di sini)</label>
+          <textarea id="ps-autofill" rows="3"
+            placeholder="Format: Jam Kiri | Waktu WIB Lengkap | Nama Liga | Pertandingan (Home vs Away) | Skor (Home - Away) | URL Logo Home | URL Logo Away
+
+Contoh: 27/Jun 02:00 | SABTU 27 JUNI 02.00 WIB | PIALA DUNIA | NORWAY vs FRANCE | 1 - 4 | https://flagcdn.com/w160/no.png | https://flagcdn.com/w160/fr.png"
+            style="background:var(--surface2);border:1px solid rgba(15,157,88,0.2);border-radius:8px;padding:11px 13px;color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;outline:none;width:100%;resize:vertical;min-height:90px;"></textarea>
+        </div>
+
         <div class="form-group">
           <label>Hari, Tanggal & Waktu (WIB)</label>
           <input type="text" id="ps-time" placeholder="Contoh: Sabtu, 06 Jun - 22:00 WIB" style="width:100%;padding:12px;background:var(--surface2);border:1px solid rgba(15,157,88,0.2);color:var(--text);border-radius:8px;font-size:14px;outline:none;">
@@ -2781,12 +2791,73 @@ async function addPertandinganSelesai() {
 }
 
 function resetSelesaiForm() {
-  ['ps-time','ps-home','ps-away','ps-home-logo','ps-away-logo','ps-score','ps-custom-league','ps-sort'].forEach(id => {
+  ['ps-time','ps-home','ps-away','ps-home-logo','ps-away-logo','ps-score','ps-custom-league','ps-sort','ps-autofill'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('ps-league').value = 'EPL';
   document.getElementById('ps-custom-wrap').style.display = 'none';
 }
+
+// ═══════════════════════════════════════════
+// AUTO-FILL PERTANDINGAN SELESAI — PIKAT4D
+// Format: Jam Kiri | Waktu WIB | Liga | Home vs Away | Skor | Logo Home | Logo Away
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  const autoFillEl = document.getElementById('ps-autofill');
+  if (!autoFillEl) return;
+
+  autoFillEl.addEventListener('input', function() {
+    const raw = this.value.trim();
+    if (!raw) return;
+
+    const parts = raw.split('|').map(p => p.trim());
+    if (parts.length < 7) return;
+
+    // [0] Jam Kiri | [1] Waktu WIB | [2] Liga | [3] Pertandingan | [4] Skor | [5] Logo Home | [6] Logo Away
+    const waktuWIB     = parts[1] || '';
+    const liga         = parts[2] || '';
+    const pertandingan = parts[3] || '';
+    const skor         = parts[4] || '';
+    const logoHome     = parts[5] || '';
+    const logoAway     = parts[6] || '';
+
+    const timParts = pertandingan.split(/ vs /i);
+    const homeName = timParts[0]?.trim() || '';
+    const awayName = timParts[1]?.trim() || '';
+
+    const psTime = document.getElementById('ps-time');
+    if (psTime) psTime.value = waktuWIB;
+
+    const psHome = document.getElementById('ps-home');
+    if (psHome) psHome.value = homeName;
+
+    const psAway = document.getElementById('ps-away');
+    if (psAway) psAway.value = awayName;
+
+    const psScore = document.getElementById('ps-score');
+    if (psScore) psScore.value = skor;
+
+    const psHomeLogo = document.getElementById('ps-home-logo');
+    if (psHomeLogo) psHomeLogo.value = logoHome;
+
+    const psAwayLogo = document.getElementById('ps-away-logo');
+    if (psAwayLogo) psAwayLogo.value = logoAway;
+
+    // Cocokkan liga
+    const ligaSelect  = document.getElementById('ps-league');
+    const ligaUpper   = liga.toUpperCase().trim();
+    const ligaOptions = Array.from(ligaSelect.options).map(o => o.value);
+    if (ligaOptions.includes(ligaUpper)) {
+      ligaSelect.value = ligaUpper;
+      document.getElementById('ps-custom-wrap').style.display = 'none';
+    } else if (ligaUpper) {
+      ligaSelect.value = 'CUSTOM';
+      document.getElementById('ps-custom-wrap').style.display = 'block';
+      const customEl = document.getElementById('ps-custom-league');
+      if (customEl) customEl.value = ligaUpper;
+    }
+  });
+});
 
 async function openEditSelesai(id) {
   const { data, error } = await db.from('pertandingan_selesai').select('*').eq('id', id).single();
