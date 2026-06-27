@@ -672,32 +672,7 @@ rel="icon" type="image/png"/>
   @media (max-width: 480px) {
     .stats-grid { grid-template-columns: 1fr; }
   }
-/* ── MEMBUAT TULISAN MENU SIDEBAR MENJADI HITAM PEKAT ── */
-.sidebar a, 
-.sidebar .nav-link, 
-.sidebar .menu-item,
-.sidebar span,
-.sidebar li {
-    color: #000000 !important; /* Memaksa warna tulisan menjadi hitam pekat */
-    opacity: 1 !important;     /* Menghilangkan efek transparan/pudar */
-    font-weight: 700 !important; /* Membuat tulisan sedikit lebih tebal agar makin tegas */
-}
 
-/* Tulisan judul kategori kecil di atas (seperti kata "UTAMA") agar ikut hitam pekat */
-.sidebar .menu-header,
-.sidebar .category-title,
-.sidebar p {
-    color: #000000 !important;
-    opacity: 0.8 !important; /* Sedikit sentuhan lembut tapi tetap hitam tegas */
-}
-
-/* ── EFEK SAAT MENU DI-HOVER ATAU AKTIF (BIAR TETAP ENYAMAN DI MATA) ── */
-.sidebar a:hover, 
-.sidebar .nav-link.active, 
-.sidebar .menu-item.active {
-    background: #104c2a !important; /* Background menu aktif berubah jadi hijau tua */
-    color: #ffffff !important;       /* Teks otomatis berubah jadi putih bersih saat aktif */
-}
 </style>
 </head>
 <body>
@@ -821,9 +796,15 @@ rel="icon" type="image/png"/>
 Contoh isi: 22:00 WIB | EPL | Arsenal vs Liverpool | H 45% | D 20% | A 35% | https://site.com/logo1.png | https://site.com/logo2.png" style="background:var(--surface2);border:1px solid rgba(15,157,88,0.2);border-radius:8px;padding:11px 13px;color:var(--text);font-family:'Barlow',sans-serif;font-size:13px;outline:none;width:100%;resize:vertical;"></textarea>
         </div>
 
-        <div class="form-group">
-          <label>Hari, Tanggal & Waktu (WIB)</label>
-          <input type="text" id="j-time" placeholder="Contoh: Sabtu, 06 Jun - 22:00 WIB" style="width:100%;padding:12px;background:var(--surface2);border:1px solid rgba(15,157,88,0.2);color:var(--text);border-radius:8px;font-size:14px;outline:none;">
+       <div class="form-grid form-grid-2" style="margin-bottom:18px;">
+          <div class="form-group">
+            <label>Jam Tanding Kiri (match_time_left)</label>
+            <input type="text" id="j-time-left" placeholder="Contoh: 28/Jun 04:00">
+          </div>
+          <div class="form-group">
+            <label>Hari, Tanggal &amp; Waktu WIB (time)</label>
+            <input type="text" id="j-time" placeholder="Contoh: Sabtu, 06 Jun - 22:00 WIB" style="width:100%;padding:12px;background:var(--surface2);border:1px solid rgba(15,157,88,0.2);color:var(--text);border-radius:8px;font-size:14px;outline:none;">
+          </div>
         </div>
         <div class="form-group" style="margin-top:14px;">
           <label>Liga</label>
@@ -862,7 +843,21 @@ Contoh isi: 22:00 WIB | EPL | Arsenal vs Liverpool | H 45% | D 20% | A 35% | htt
             <input type="text" id="j-away-logo" placeholder="https://site.com/logo-away.png">
           </div>
         </div>
-         <div class="form-group" style="margin-top:14px; max-width:200px;">
+         <div class="section-divider"><span>Live Streaming (Opsional)</span></div>
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label>URL Link Live Streaming</label>
+            <input type="text" id="j-stream-url" placeholder="https://link-streaming.com/live123">
+          </div>
+          <div class="form-group">
+            <label>Status Live</label>
+            <select id="j-is-live">
+              <option value="false">Nonaktif (belum live)</option>
+              <option value="true">Aktif (sedang live)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:14px; max-width:200px;">
           <label>Urutan Tampil (sort_order)</label>
           <input type="number" id="j-sort" placeholder="Contoh: 1" min="1">
         </div>
@@ -1584,9 +1579,15 @@ Contoh: 27/Jun 02:00 | SABTU 27 JUNI 02.00 WIB | PIALA DUNIA | NORWAY vs FRANCE 
     <button class="edit-modal-close" onclick="closeModal('jadwal')">✕</button>
     <div class="edit-modal-title">✏️ Edit Jadwal</div>
     <input type="hidden" id="ej-id">
-    <div class="form-group" style="margin-bottom:14px;">
-      <label>Hari, Tanggal & Waktu (WIB)</label>
-      <input type="text" id="ej-time" placeholder="Contoh: Sabtu, 06 Jun - 22:00 WIB">
+   <div class="form-grid form-grid-2" style="margin-bottom:14px;">
+      <div class="form-group">
+        <label>Jam Tanding Kiri (match_time_left)</label>
+        <input type="text" id="ej-time-left" placeholder="28/Jun 04:00">
+      </div>
+      <div class="form-group">
+        <label>Hari, Tanggal &amp; Waktu WIB</label>
+        <input type="text" id="ej-time" placeholder="Contoh: Sabtu, 06 Jun - 22:00 WIB">
+      </div>
     </div>
     <div class="form-group" style="margin-bottom:14px;">
       <label>Liga</label>
@@ -1613,7 +1614,21 @@ Contoh: 27/Jun 02:00 | SABTU 27 JUNI 02.00 WIB | PIALA DUNIA | NORWAY vs FRANCE 
         <input type="text" id="ej-away-logo" placeholder="https://...">
       </div>
     </div>
-     <div class="form-group" style="margin-top:14px; max-width:200px;">
+     <div class="section-divider"><span>Live Streaming (Opsional)</span></div>
+    <div class="form-grid form-grid-2">
+      <div class="form-group">
+        <label>URL Link Live Streaming</label>
+        <input type="text" id="ej-stream-url" placeholder="https://link-streaming.com/live123">
+      </div>
+      <div class="form-group">
+        <label>Status Live</label>
+        <select id="ej-is-live">
+          <option value="false">Nonaktif (belum live)</option>
+          <option value="true">Aktif (sedang live)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:14px; max-width:200px;">
       <label>Urutan Tampil (sort_order)</label>
       <input type="number" id="ej-sort" placeholder="Contoh: 1" min="1">
     </div>
@@ -1823,13 +1838,8 @@ async function handleLogout() {
 
 async function initApp() {
   await checkDb();
-  loadDashboard();
-  loadJadwal();
-  loadHasil();
-  loadMarquee();
-  loadBanner();
-  loadLaporan();
-  loadPertandinganSelesaiAdmin();
+  loadDashboard(); // Hanya dashboard yang dimuat saat pertama buka
+  // Halaman lain akan dimuat saat admin klik menu-nya via showPage()
 }
 
 async function checkDb() {
@@ -1863,6 +1873,17 @@ function showPage(id) {
     if (n.getAttribute('onclick')?.includes("'" + id + "'")) n.classList.add('active');
   });
   closeSidebar();
+
+  // Muat data sesuai halaman yang dibuka
+  const loaders = {
+    jadwal:  loadJadwal,
+    hasil:   loadHasil,
+    marquee: loadMarquee,
+    banner:  loadBanner,
+    laporan: loadLaporan,
+    selesai: loadPertandinganSelesaiAdmin,
+  };
+  if (loaders[id]) loaders[id]();
 }
 function openSidebar() {
   document.getElementById('sidebar').classList.add('open');
@@ -2017,13 +2038,16 @@ async function loadJadwal() {
 }
 
 async function addJadwal() {
-  const time       = document.getElementById('j-time').value.trim();
-  const league     = getLeagueValue('j');
-  const match_name = document.getElementById('j-match').value.trim();
-  const prob       = document.getElementById('j-prob').value.trim();
-  const home_logo  = document.getElementById('j-home-logo').value.trim() || null;
-  const away_logo  = document.getElementById('j-away-logo').value.trim() || null;
-  const sort_order = parseInt(document.getElementById('j-sort').value) || null;
+  const time            = document.getElementById('j-time').value.trim();
+  const league          = getLeagueValue('j');
+  const match_name      = document.getElementById('j-match').value.trim();
+  const prob            = document.getElementById('j-prob').value.trim();
+  const home_logo       = document.getElementById('j-home-logo').value.trim() || null;
+  const away_logo       = document.getElementById('j-away-logo').value.trim() || null;
+  const sort_order      = parseInt(document.getElementById('j-sort').value) || null;
+  const match_time_left = document.getElementById('j-time-left').value.trim() || null;
+  const stream_url      = document.getElementById('j-stream-url').value.trim() || null;
+  const is_live         = document.getElementById('j-is-live').value === 'true';
 
   if (!time)       return toast('Waktu wajib diisi!', 'error');
   if (!league)     return toast('Nama liga wajib diisi!', 'error');
@@ -2033,7 +2057,7 @@ async function addJadwal() {
   const btn = document.getElementById('btn-add-jadwal');
   setBtnLoading(btn, true, 'Menyimpan...');
   try {
-    const { error } = await db.from('jadwal').insert([{ time, league, match_name, prob, home_logo, away_logo, sort_order }]);
+    const { error } = await db.from('jadwal').insert([{ time, league, match_name, prob, home_logo, away_logo, sort_order, match_time_left, stream_url, is_live }]);
     if (error) throw error;
     toast('Jadwal berhasil disimpan!');
     resetJadwalForm();
@@ -2043,11 +2067,12 @@ async function addJadwal() {
 }
 
 function resetJadwalForm() {
-  ['j-time','j-match','j-prob','j-custom-league','j-home-logo','j-away-logo','j-sort'].forEach(id => {
+  ['j-time','j-match','j-prob','j-custom-league','j-home-logo','j-away-logo','j-sort','j-time-left','j-stream-url'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   document.getElementById('j-league').value = 'EPL';
   document.getElementById('j-custom-wrap').style.display = 'none';
+  document.getElementById('j-is-live').value = 'false';
 }
 
 // ═══════════════════════════════════════════
@@ -2089,14 +2114,17 @@ async function openEditJadwal(id) {
   const { data, error } = await db.from('jadwal').select('*').eq('id', id).single();
   if (error) return toast('Gagal ambil data: ' + error.message, 'error');
 
-  document.getElementById('ej-id').value        = data.id;
-  document.getElementById('ej-time').value      = data.time || '';
-  document.getElementById('ej-league').value    = data.league || '';
-  document.getElementById('ej-match').value     = data.match_name || '';
-  document.getElementById('ej-prob').value      = data.prob || '';
-  document.getElementById('ej-home-logo').value = data.home_logo || '';
-  document.getElementById('ej-away-logo').value = data.away_logo || '';
-  document.getElementById('ej-sort').value = data.sort_order ?? '';
+  document.getElementById('ej-id').value         = data.id;
+  document.getElementById('ej-time').value        = data.time || '';
+  document.getElementById('ej-league').value      = data.league || '';
+  document.getElementById('ej-match').value       = data.match_name || '';
+  document.getElementById('ej-prob').value        = data.prob || '';
+  document.getElementById('ej-home-logo').value   = data.home_logo || '';
+  document.getElementById('ej-away-logo').value   = data.away_logo || '';
+  document.getElementById('ej-sort').value        = data.sort_order ?? '';
+  document.getElementById('ej-time-left').value   = data.match_time_left || '';
+  document.getElementById('ej-stream-url').value  = data.stream_url || '';
+  document.getElementById('ej-is-live').value     = data.is_live ? 'true' : 'false';
 
   document.querySelectorAll('#jadwal-body tr').forEach(r => r.classList.remove('editing-row'));
   const row = document.getElementById('jrow-' + id);
@@ -2122,6 +2150,10 @@ async function saveEditJadwal() {
     const btn = document.getElementById('btn-save-jadwal');
     setBtnLoading(btn, true, 'Menyimpan...');
     try {
+        const match_time_left = document.getElementById('ej-time-left').value.trim() || null;
+        const stream_url      = document.getElementById('ej-stream-url').value.trim() || null;
+        const is_live         = document.getElementById('ej-is-live').value === 'true';
+
         const { error } = await db.from('jadwal').update({
             time,
             league,
@@ -2129,7 +2161,10 @@ async function saveEditJadwal() {
             prob,
             home_logo,
             away_logo,
-            sort_order
+            sort_order,
+            match_time_left,
+            stream_url,
+            is_live
         }).eq('id', id);
         if (error) throw error;
         toast('Jadwal berhasil diperbarui!');
@@ -2777,7 +2812,8 @@ async function addPertandinganSelesai() {
   setBtnLoading(btn, true, 'Menyimpan...');
   try {
     const { error } = await db.from('pertandingan_selesai').insert([{
-      time, league, match_name, home, away, home_logo, away_logo, score, sort_order
+      time, league, match_name, home, away, home_logo, away_logo, score, sort_order,
+      finished_at: new Date().toISOString()
     }]);
     if (error) throw error;
     toast('Data berhasil disimpan!');
@@ -2938,7 +2974,8 @@ async function geserTanggalSelesai(id, offsetDays) {
   const target = new Date();
   target.setDate(target.getDate() - offset);
 
-  target.setUTCHours(5, 0, 0, 0);
+  // Tengah hari WIB (UTC+7 = 12:00) agar selalu jatuh di hari yang benar
+  target.setUTCHours(5, 0, 0, 0); // UTC 05:00 = WIB 12:00 siang
 
   const { error } = await db
     .from('pertandingan_selesai')
@@ -2962,12 +2999,19 @@ async function bersihkanDataLama() {
   threshold.setDate(threshold.getDate() - 2);
   threshold.setUTCHours(0, 0, 0, 0);
 
-  const { error, count } = await db
+  const { error: e1 } = await db
     .from('pertandingan_selesai')
-    .delete({ count: 'exact' })
+    .delete()
     .lt('finished_at', threshold.toISOString());
 
-  if (error) return toast('Gagal membersihkan data: ' + error.message, 'error');
+  const { error: e2 } = await db
+    .from('pertandingan_selesai')
+    .delete()
+    .is('finished_at', null);
+
+  if (e1 || e2) return toast('Gagal membersihkan data: ' + (e1?.message || e2?.message), 'error');
+
+  
 
   toast(`${count ?? 0} data lama berhasil dihapus.`, 'success');
   loadPertandinganSelesaiAdmin();
